@@ -1,0 +1,14 @@
+curl https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/fontawesome-webfont.eot?v=4.7.0 > fontawesome-webfont.4.7.0.eot
+
+
+curl https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/fontawesome-webfont.eot?#iefix&v=4.7.0 > fontawesome-webfont.iefix.4.7.0.eot
+
+
+
+wget --no-check-certificate -O fontawesome-webfont.4.7.0.woff2 https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/fontawesome-webfont.woff2?v=4.7.0 
+
+wget --no-check-certificate -O fontawesome-webfont.4.7.0.woff https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/fontawesome-webfont.woff?v=4.7.0 
+
+
+wget --no-check-certificate -O fontawesome-webfont.4.7.0.ttf https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/fontawesome-webfont.ttf?v=4.7.0
+

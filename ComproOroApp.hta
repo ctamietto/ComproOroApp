@@ -1,0 +1,338 @@
+<!doctype html>
+<html>
+<head>
+<title>Gestione Spedizioni</title>
+<meta http-equiv="X-UA-Compatible" content="IE=9">
+
+<!--
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/fontawesome.min.css" >
+-->
+
+<link rel="stylesheet" href="css/fontawesome.css" >
+
+<link rel="stylesheet" href="css/local_style.css" >
+
+
+
+
+<HTA:APPLICATION
+ID="Gestione Spedizioni"
+INNERBORDER="no"
+CONTEXTMENU="no"
+/>
+
+<script language="VBScript" src="scripts/script.vbs" />
+
+<script language="VBScript">
+	Sub window_onLoad()
+		'This method will be called when the application loads
+		'Add your code here
+		MsgBox "started"
+		getSped()
+	End Sub
+</script>
+
+<script>
+	function DoStartup() {
+		getStoreTO()
+		getStoreBM()
+		getStoredSpeds()
+		displayAllSpeds()
+	}
+	
+	function isNumberKey(evt) {
+  		var charCode = (evt.which) ? evt.which : evt.keyCode
+  		if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+    		return false;
+    	}
+  		return true;
+	}
+	function isDecimalKey(evt) {
+  		var charCode = (evt.which) ? evt.which : evt.keyCode
+  		if (charCode != 44) {
+  			return isNumberKey(evt);
+    	}
+  		return true;
+	}
+	function add_sped_js() {
+		insert_sped();
+		document.getElementById("banco_metalli").focus();
+	}
+	function delete_sped_js(kt) {
+		if (confirm("Confermi la cancellazione ?") == true) {
+			delete_sped(kt)
+		}
+	}
+	
+
+</script>
+
+</head>
+
+<body bgcolor="white" onLoad='DoStartup();' >
+
+<!--{{InsertControlsHere}} - Do not remove this line-->
+
+<div id="navbar" name="navbar" >
+	<div id="navbar_item_sped" class="navbar_item navbar_item_selected" onClick="select_tab('speds')" >
+			<h2>Spedizioni</h2>
+	</div>
+	<div id="navbar_item_bm" class="navbar_item" onClick="select_tab('bm')" >
+			<h2>Banco Metalli</h2>
+	</div>
+	<div id="navbar_item_titoli" class="navbar_item" onClick="select_tab('titoli')" >
+			<h2>Titolo Oro</h2>
+	</div>
+	<div style="clear:both">
+	</div>
+</div>
+
+<div id="titoli_section" style="display:none" >
+	<div id="list_titoli_container">
+		TODO LIST TITOLI
+	</div>
+</div>
+
+<div id="banco_metalli_section"  style="display:none" >
+	<div id="list_banco_metalli_container">
+		TODO LIST CONTAINER
+	</div>
+</div>
+
+
+<div id="spedizioni_section">
+
+	<div id="list_speds_container" >
+	<table cellspacing="0" cellpadding="0" id="spedizioni_table" >
+		<tr class="header_tr" >
+			<th class="header_sped" colspan="4" >Dati DDT</th>
+			<th class="header_sped" colspan="4" >Dati Verga</th>
+			<th class="header_sped" colspan="3" >Dati Verga Fonderia</th>
+			<th class="header_sped" colspan="2" >Laboratorio Controsaggio</th>
+			<th class="header_sped" colspan="2" >Differenza</th>
+			<th class="header_sped" colspan="2" >Differenza Laboratorio</th>
+			<th class="header_sped" colspan="2" >&nbsp;</th>
+		</tr>
+		<tr class="header_tr" >
+			<th class="header_sped" >
+				Banco Metalli
+			</th>
+			<th class="header_sped" >
+				Titolo Oro 
+			</th>
+			<th class="header_sped" >
+				Numero DDT
+			</th>
+			<th class="header_sped" >
+				Data DDT
+			</th>
+			<!--
+			<th class="header_sped" >
+				Gr Lordi
+			</th>
+			<th class="header_sped" >
+				Gr Puri Stimati
+			</th>		
+			-->
+			
+			<th class="header_sped" >
+				Verga Stimata
+			</th>
+			<th class="header_sped" >
+				Tit. Stimato Verga
+			</th>
+			<th class="header_sped" >
+				Tot. Gr. Rottami
+			</th>
+			<th class="header_sped" >
+				Tot. Gr. Puro
+			</th>
+			
+			<th class="header_sped" >
+				Verga 
+			</th>
+			<th class="header_sped" >
+				Titolo 
+			</th>
+			<th class="header_sped" >
+				Tot. Gr. Puro 
+			</th>			
+			
+			<th class="header_sped" >
+				Titolo 
+			</th>
+			<th class="header_sped" >
+				Tot. Gr. Puro
+			</th>
+									
+			<th class="header_sped" style="background-color:#fb923c;" >
+				Grammi 
+			</th>			
+			<th class="header_sped" style="background-color:#fb923c;" >
+				Percentuale
+			</th>			
+
+
+			<th class="header_sped" style="background-color:#fb923c;" >
+				Grammi 
+			</th>			
+			<th class="header_sped" style="background-color:#fb923c;" >
+				Percentuale
+			</th>			
+
+			<th colspan="2" class="header_sped">
+				<i style="top:20px" id="add_sped" class="fa fa-sharp fa-solid fa-plus icon_style_diff" onClick="add_sped_js()" ></i>
+			</th>
+		</tr>
+	</table>
+	</div>
+	
+	<div id="mod_add_sped_container">
+		<form id="ValidForm" onsubmit="submit_sped(); return false;">
+			<input type="hidden" id="kt" name="kt" >
+			<fieldset style="margin-bottom:10px;border-radius: 5px;">
+				<legend>Dati DDT:</legend>
+				<div>
+					<div class="field_div">
+						<label class="label_div" for="banco_metalli">Banco Metalli <br/>
+							<select id="banco_metalli" name="banco_metalli"  onchange="SpedDetailValidate()"  ></select>
+							<div id="banco_metalli_error" name="banco_metalli_error" class="error_desc" ></div>
+						</label>
+					</div>
+					<div class="field_div">
+						<label class="label_div" for="numero_ddt">Numero DDT <br/>
+							<input id="numero_ddt" name="numero_ddt" TYPE="TEXT" SIZE="15" onchange="SpedDetailValidate()"  >
+							<div id="numero_ddt_error" name="numero_ddt_error" class="error_desc" ></div>
+						</label>
+					</div>
+					<div class="field_div">
+						<label class="label_div" for="data_ddt">Data DDT <br/>
+							<input id="data_ddt" name="data_ddt" TYPE="TEXT" SIZE="15" onchange="SpedDetailValidate()"  >
+							<div id="data_ddt_error" name="data_ddt_error" class="error_desc" ></div>
+						</label>
+					</div>
+					<div class="field_div">
+						<label class="label_div" for="titolo_oro_id">Titolo Oro<br/>
+							<select id="titolo_oro_id" name="titolo_oro_id" onchange="SpedDetailValidate()" ></select>
+							<div id="titolo_oro_id_error" name="titolo_oro_id_error" class="error_desc" ></div>
+						</label>
+					</div>
+				</div>
+			</fieldset>
+			
+			<div>
+				<fieldset style="margin-bottom:10px;float:left;">
+					<legend>Dati Verga:</legend>
+					<div>
+						<div class="field_div">
+							<label class="label_div" for="totale_grammi_rottami">Totale Grammi Rottami <br/>
+								<input id="totale_grammi_rottami" name="totale_grammi_rottami" TYPE="TEXT" SIZE="15" onkeypress="return isDecimalKey(event)" onchange="SpedDetailValidate()"  >
+								<div id="totale_grammi_rottami_error" name="totale_grammi_rottami_error" class="error_desc" ></div>
+							</label>
+						</div>
+						<div class="field_div">
+							<label class="label_div" for="verga_stimata">Verga Stimata <br/>
+								<input id="verga_stimata" name="verga_stimata" TYPE="TEXT" SIZE="15" disabled >
+							</label>
+						</div>
+						<div class="field_div">
+							<label class="label_div" for="titolo_stimato_verga">Titolo Stimato Verga <br/>
+								<input id="titolo_stimato_verga" name="titolo_stimato_verga" TYPE="TEXT" SIZE="15" disabled >
+							</label>
+						</div>
+						<div class="field_div">
+							<label class="label_div" for="totale_grammi_puro">Totale Grammi Puro <br/>
+								<input id="totale_grammi_puro" name="totale_grammi_puro" TYPE="TEXT" SIZE="15" disabled >
+								<!--
+								<div id="totale_grammi_puro_error" name="totale_grammi_puro_error" class="error_desc" ></div>
+								-->
+							</label>
+						</div>
+					</div>
+				</fieldset>
+				<fieldset style="margin-bottom:10px;float:left;">
+					<legend>Dati Verga Fonderia:</legend>
+					<div>
+						<div class="field_div">
+							<label class="label_div" for="verga_fonderia">Verga<br/>
+								<input id="verga_fonderia" name="verga_fonderia" TYPE="TEXT" SIZE="15" onkeypress="return isDecimalKey(event)" onchange="SpedDetailValidate()"  >
+								<div id="verga_fonderia_error" name="verga_fonderia_error" class="error_desc" ></div>
+							</label>
+						</div>
+						<div class="field_div">
+							<label class="label_div" for="titolo_fonderia">Titolo <br/>
+								<input id="titolo_fonderia" name="titolo_fonderia" TYPE="TEXT" SIZE="15" onkeypress="return isDecimalKey(event)" onchange="SpedDetailValidate()"  >
+								<div id="titolo_fonderia_error" name="titolo_fonderia_error" class="error_desc" ></div>
+							</label>
+						</div>
+						<div class="field_div">
+							<label class="label_div" for="totale_grammi_puro_fonderia">Totale Grammi Puro <br/>
+								<input id="totale_grammi_puro_fonderia" name="totale_grammi_puro_fonderia" TYPE="TEXT" SIZE="15" disabled >
+							</label>
+						</div>
+					</div>
+				</fieldset>
+				<fieldset style="margin-bottom:10px;float:left;">
+					<legend>Dati Laboratorio Controdosaggio:</legend>
+					<div>
+						<div class="field_div">
+							<label class="label_div" for="titolo_lab_controsaggio">Titolo<br/>
+								<input id="titolo_lab_controsaggio" name="titolo_lab_controsaggio" TYPE="TEXT" SIZE="15" onkeypress="return isDecimalKey(event)" onchange="SpedDetailValidate()"  >
+								<div id="titolo_lab_controsaggio_error" name="titolo_lab_controsaggio_error" class="error_desc" ></div>
+							</label>
+						</div>
+						<div class="field_div">
+							<label class="label_div" for="puro_stimato_lab_controsaggio">Totale Grammi Puro <br/>
+								<input id="puro_stimato_lab_controsaggio" name="puro_stimato_lab_controsaggio" TYPE="TEXT" SIZE="15" disabled >
+							</label>
+						</div>
+					</div>
+				</fieldset>
+				<div style="clear:both;">
+				</div>	
+			</div>
+
+			<div>
+				<fieldset style="margin-bottom:10px;float:left;">
+					<legend>Dati Differenza:</legend>
+					<div class="field_div" >
+						<label class="label_div" for="">Differenza Grammi <br/>
+							<p id="differenza_grammi" name="differenza_grammi" style="padding:0px;background-color:#fb923c;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
+						</label>
+					</div>
+					<div class="field_div" >
+						<label class="label_div" for="">Differenza Percentuale <br/>
+							<p id="differenza_percentuale" name="differenza_percentuale" style="padding:0px;background-color:#fb923c;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
+						</label>
+					</div>
+				</fieldset>
+				<fieldset style="margin-bottom:10px;float:left;">
+					<legend>Dati Differenza Laboratorio:</legend>
+					<div class="field_div" >
+						<label class="label_div" for="">Differenza Grammi <br/>
+							<p id="differenza_grammi_con_saggio" name="differenza_grammi_con_saggio" style="padding:0px;background-color:#fb923c;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
+						</label>
+					</div>
+					<div class="field_div" >
+						<label class="label_div" for="">Differenza Percentuale <br/>
+							<p id="differenza_percentuale_con_saggio" name="differenza_percentuale_con_saggio" style="padding:0px;background-color:#fb923c;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
+						</label>
+					</div>
+				</fieldset>
+				<div style="clear:both;">
+				</div>	
+			</div>
+						
+			<div style="clear:both;float: right;">
+				<input name="Submit" type="submit" VALUE="Conferma">
+				<button name="back_to_list" type="button" onclick="show_speds_list()">Annulla</button> 		
+			</div>		
+		</form>		
+	</div>
+</div>
+
+</body>
+</html>
