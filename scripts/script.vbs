@@ -1,20 +1,27 @@
 	'Dim kt as string
-	
+		
+	' testata spedizione
 	Class spedclass
-    	Public kt,banco_metalli_id,banco_metalli_desc, titolo_oro_id, titolo_oro_desc , data_ddt, numero_ddt
-    	Public verga_stimata , titolo_stimato_verga , totale_grammi_rottami , totale_grammi_puro 
+    	Public kt,banco_metalli_id,banco_metalli_desc , data_ddt, numero_ddt
+    	'Public titolo_oro_id, titolo_oro_desc
+    	Public verga_stimata , titolo_stimato_verga , totale_grammi_rottami , totale_grammi_puro_stimato
     	Public verga_fonderia , titolo_fonderia , totale_grammi_puro_fonderia
     	Public titolo_lab_controsaggio , puro_stimato_lab_controsaggio
     	Public differenza_grammi,differenza_percentuale  
     	Public differenza_grammi_con_saggio,differenza_percentuale_con_saggio
 	End Class
 
+	' dettaglio spedizione 
+	Class speddetclass
+		Public kt,fk,titolo_oro_id,titolo_oro_desc,grammi_lordi,grammi_puro_stimati	
+	End Class 
+
 	Class bmclass
     	Public kt,desc
 	End Class
 
 	Class toclass
-    	Public kt,desc,coefficiente
+    	Public kt,desc,coefficiente,coefficiente_titolo_stimato
 	End Class
 
 	Class errorclass
@@ -22,12 +29,20 @@
 	End Class
 
 	Public speddict: Set speddict = CreateObject("Scripting.Dictionary")
+	
+	Public speddetdict: Set speddetdict = CreateObject("Scripting.Dictionary")
+
+	Public currspeddetdict: Set currspeddetdict = CreateObject("Scripting.Dictionary")
 
 	Public bmdict: Set bmdict = CreateObject("Scripting.Dictionary")
 
 	Public todict: Set todict = CreateObject("Scripting.Dictionary")
 	
 	Public spederrorsdict: Set spederrorsdict = CreateObject("Scripting.Dictionary")
+
+	Sub initialSizeAndPos
+		window.moveTo 30, 30
+	End Sub 
 
 	Function SpedErrorsStatus
 		Dim ES
@@ -71,7 +86,7 @@
 		
 		spedDest.data_ddt = spedSrc.data_ddt
 		
-		spedDest.titolo_oro_id = spedSrc.titolo_oro_id
+		'spedDest.titolo_oro_id = spedSrc.titolo_oro_id
 		
 		spedDest.verga_stimata = spedSrc.verga_stimata
 		
@@ -79,7 +94,7 @@
 		
 		spedDest.totale_grammi_rottami = spedSrc.totale_grammi_rottami
 		
-		spedDest.totale_grammi_puro = spedSrc.totale_grammi_puro
+		spedDest.totale_grammi_puro_stimato = spedSrc.totale_grammi_puro_stimato
 		
 		spedDest.verga_fonderia = spedSrc.verga_fonderia
 		
@@ -186,23 +201,23 @@
 			End If
 		End If 
 			
-		Set titolo_oro_id = document.getElementById( "titolo_oro_id" )
+		'Set titolo_oro_id = document.getElementById( "titolo_oro_id" )
 
-		If (IsNull(titolo_oro_id.value) Or IsEmpty(titolo_oro_id.value)) Then
-			sped.titolo_oro_id = ""
-		Else 
-			sped.titolo_oro_id  = titolo_oro_id.value
-		End If		
+		'If (IsNull(titolo_oro_id.value) Or IsEmpty(titolo_oro_id.value)) Then
+		'	sped.titolo_oro_id = ""
+		'Else 
+		'	sped.titolo_oro_id  = titolo_oro_id.value
+		'End If		
 
-		If (sped.titolo_oro_id = "") Then
-			Dim errclTOI: Set errclTOI = New errorclass
-			errclTOI.cod   = "000004"
-			errclTOI.tipo  = "REQUIRED"
-			errclTOI.field = "titolo_oro_id"
-			errclTOI.desc  = "IMPOSTARE TITOLO ORO"
-			SpedErrorsAdd(errclTOI)
-			anyErrors = True  
-		End If
+		'If (sped.titolo_oro_id = "") Then
+		'	Dim errclTOI: Set errclTOI = New errorclass
+		'	errclTOI.cod   = "000004"
+		'	errclTOI.tipo  = "REQUIRED"
+		'	errclTOI.field = "titolo_oro_id"
+		'	errclTOI.desc  = "IMPOSTARE TITOLO ORO"
+		'	SpedErrorsAdd(errclTOI)
+		'	anyErrors = True  
+		'End If
 				
 		Set totale_grammi_rottami = document.getElementById( "totale_grammi_rottami" )
 		sped.totale_grammi_rottami = totale_grammi_rottami.value
@@ -223,12 +238,12 @@
 			anyErrors = True  
 		End If
 
-		Set totale_grammi_puro = document.getElementById( "totale_grammi_puro" )
+		Set totale_grammi_puro_stimato = document.getElementById( "totale_grammi_puro_stimato" )
 
-		If (IsNull(totale_grammi_puro.value) Or IsEmpty(totale_grammi_puro.value)) Then
-			sped.totale_grammi_puro = 0
+		If (IsNull(totale_grammi_puro_stimato.value) Or IsEmpty(totale_grammi_puro_stimato.value)) Then
+			sped.totale_grammi_puro_stimato = 0
 		Else 
-			sped.totale_grammi_puro  = CDbl(totale_grammi_puro.value)  
+			sped.totale_grammi_puro_stimato  = CDbl(totale_grammi_puro_stimato.value)  
 		End If		
 
 		'If (sped.totale_grammi_puro <= 0) Then
@@ -383,24 +398,24 @@
 			End if 
  		Next
 
-		Set titolo_oro_id = document.getElementById( "titolo_oro_id" )
-		For Each opt In titolo_oro_id.Options
-  			If opt.Value = sped.titolo_oro_id Then
-    			opt.Selected = True
-  			Else
-    			opt.Selected = False
-  			End If
-		Next
-		Set titolo_oro_id_error_list = document.getElementsByName("titolo_oro_id_error") 
- 		For Each Elem In titolo_oro_id_error_list
- 			Dim titolo_oro_id_error_object: Set titolo_oro_id_error_object = New errorclass			
- 			If spederrorsdict.Exists("titolo_oro_id") Then
-				Set titolo_oro_id_error_object = spederrorsdict.Item("titolo_oro_id")
-		  		Elem.innerHTML = titolo_oro_id_error_object.desc
-		  	Else 
-		  		Elem.innerHTML = ""
-			End if 
- 		Next
+		'Set titolo_oro_id = document.getElementById( "titolo_oro_id" )
+		'For Each opt In titolo_oro_id.Options
+  		'	If opt.Value = sped.titolo_oro_id Then
+    	'		opt.Selected = True
+  		'	Else
+    	'		opt.Selected = False
+  		'	End If
+		'Next
+		'Set titolo_oro_id_error_list = document.getElementsByName("titolo_oro_id_error") 
+ 		'For Each Elem In titolo_oro_id_error_list
+ 		'	Dim titolo_oro_id_error_object: Set titolo_oro_id_error_object = New errorclass			
+ 		'	If spederrorsdict.Exists("titolo_oro_id") Then
+		'		Set titolo_oro_id_error_object = spederrorsdict.Item("titolo_oro_id")
+		'  		Elem.innerHTML = titolo_oro_id_error_object.desc
+		'  	Else 
+		'  		Elem.innerHTML = ""
+		'	End if 
+ 		'Next
 
 		Set verga_stimata = document.getElementById( "verga_stimata" )
 		verga_stimata.value = CStr(sped.verga_stimata)
@@ -421,19 +436,19 @@
 			End if 
  		Next
 				
-		Set totale_grammi_puro = document.getElementById( "totale_grammi_puro" )
-		totale_grammi_puro.value = CStr(sped.totale_grammi_puro)
+		Set totale_grammi_puro_stimato = document.getElementById( "totale_grammi_puro_stimato" )
+		totale_grammi_puro_stimato.value = CStr(sped.totale_grammi_puro_stimato)
 		
-		Set totale_grammi_puro_error_list = document.getElementsByName("totale_grammi_puro_error") 
- 		For Each Elem In totale_grammi_puro_error_list
- 			Dim totale_grammi_puro_error_object: Set totale_grammi_puro_error_object = New errorclass			
- 			If spederrorsdict.Exists("totale_grammi_puro") Then
-				Set totale_grammi_puro_error_object = spederrorsdict.Item("totale_grammi_puro")
-		  		Elem.innerHTML = totale_grammi_puro_error_object.desc
-		  	Else 
-		  		Elem.innerHTML = ""
-			End if 
- 		Next
+		'Set totale_grammi_puro_error_list = document.getElementsByName("totale_grammi_puro_error") 
+ 		'For Each Elem In totale_grammi_puro_error_list
+ 		'	Dim totale_grammi_puro_error_object: Set totale_grammi_puro_error_object = New errorclass			
+ 		'	If spederrorsdict.Exists("totale_grammi_puro") Then
+		'		Set totale_grammi_puro_error_object = spederrorsdict.Item("totale_grammi_puro")
+		' 		Elem.innerHTML = totale_grammi_puro_error_object.desc
+		'  	Else 
+		' 		Elem.innerHTML = ""
+		'	End if 
+ 		'Next
 
 		Set verga_fonderia = document.getElementById( "verga_fonderia" )
 		verga_fonderia.value = CStr(sped.verga_fonderia)
@@ -507,6 +522,8 @@
 		Set kt = document.getElementById( "kt" )
 		kt.value = sped.kt
 		
+		displayAllTitoli()
+		
     End Sub
 	
 	Sub getStoreBM()
@@ -532,6 +549,7 @@
 				.kt = "x07cb0bc-f3c7-461f-ae7f-93b1430912db"
     			.desc = "999,9"
     			.coefficiente = 0.999
+    			.coefficiente_titolo_stimato = 0.999
 			End With
 			todict.Add toi.kt, toi
 
@@ -540,6 +558,7 @@
 				.kt = "y799419d-ae66-4174-986e-1da78274695a"
     			.desc = "985"
     			.coefficiente = 0.98
+    			.coefficiente_titolo_stimato = 0.998
 			End With
 			todict.Add toi.kt, toi
 
@@ -548,6 +567,7 @@
 				.kt = "z71d8c09-2351-4c04-8087-c9d7c7876e12"
     			.desc = "916"
     			.coefficiente = 0.914
+    			.coefficiente_titolo_stimato = 0.998
 			End With
 			todict.Add toi.kt, toi
 
@@ -556,6 +576,7 @@
 				.kt = "y71d8c09-2351-4c04-8087-c9d7c7876e12"
     			.desc = "900"
     			.coefficiente = 0.894    			
+    			.coefficiente_titolo_stimato = 0.998
 			End With
 			todict.Add toi.kt, toi
 
@@ -564,6 +585,7 @@
 				.kt = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
     			.desc = "750"
     			.coefficiente = 0.738  			
+    			.coefficiente_titolo_stimato = 0.992
 			End With
 			todict.Add toi.kt, toi
 
@@ -572,6 +594,7 @@
 				.kt = "a71d8c09-2351-4c04-8087-c9d7c7876e12"				
     			.desc = "585"
     			.coefficiente = 0.55    			
+    			.coefficiente_titolo_stimato = 0.99
 			End With
 			todict.Add toi.kt, toi
 
@@ -579,7 +602,8 @@
 			With toi
 				.kt = "b71d8c09-2351-4c04-8087-c9d7c7876e12"
     			.desc = "500"
-    			.coefficiente = 0.475    			
+    			.coefficiente = 0.475
+    			.coefficiente_titolo_stimato = 0.99    			
 			End With
 			todict.Add toi.kt, toi
 
@@ -588,6 +612,7 @@
 				.kt = "c71d8c09-2351-4c04-8087-c9d7c7876e12"
     			.desc = "375"
     			.coefficiente = 0.35
+    			.coefficiente_titolo_stimato = 0.985
 			End With
 			todict.Add toi.kt, toi
 
@@ -596,10 +621,56 @@
 				.kt = "d71d8c09-2351-4c04-8087-c9d7c7876e12"
     			.desc = "333"
     			.coefficiente = 0.318    			
+    			.coefficiente_titolo_stimato = 0.985
 			End With
 			todict.Add toi.kt, toi
 
     End Sub
+
+	Sub getStoredSpedDetts()	
+		Dim speddet: Set speddet = new speddetclass
+
+		'titolo oro desc => 750
+		With speddet
+			.kt = "94da5c56-0c30-477a-bc24-ac603a30e3c7"
+			.fk = "edfc686e267e4a8daa434ee9577e81c8"
+    		.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
+    		.grammi_lordi = 3015.44
+		End With	
+		speddetdict.Add speddet.kt, speddet
+		
+		Set speddet = new speddetclass
+		'titolo oro desc => 750
+		With speddet
+			.kt = "cd1cdfa0-bafb-4362-b3ca-0efa035bee97"
+			.fk = "bf7431f2b63449569d067c5705d24a67"
+    		.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
+    		.grammi_lordi = 3030.21
+		End With	
+		speddetdict.Add speddet.kt, speddet
+		
+		Set speddet = new speddetclass
+		'titolo oro desc => 750
+		With speddet
+			.kt = "32cf79e5-a2c8-4e22-9273-6fd04cde5a2c"
+			.fk = "a067b56f757841cb93af2a0482eb4451"
+    		.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
+    		.grammi_lordi = 2988.5
+		End With	
+		speddetdict.Add speddet.kt, speddet
+    End Sub
+
+	Sub getDettsOfSped(fk)
+		currspeddetdict.RemoveAll()
+		If ( fk <> "" ) Then 
+			For Each i In speddetdict.Keys
+    			Set csddi = speddetdict.Item(i)
+    			If ( csddi.fk = fk ) Then
+    				currspeddetdict.Add csddi.kt, csddi
+    			End If 
+			Next
+		End If      	
+	End Sub 
 	
 	Sub getStoredSpeds()
 			Dim sped: Set sped = new spedclass
@@ -608,9 +679,12 @@
 			With sped
 				.kt = "edfc686e267e4a8daa434ee9577e81c8"
     			.banco_metalli_id = "c07cb0bc-f3c7-461f-ae7f-93b1430912db"
-    			.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
+    			'.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
     			.data_ddt = "17/11/2022"
     			.numero_ddt = 122
+				.totale_grammi_puro_stimato = 2225.39
+				.verga_stimata = 2994.33
+				.titolo_stimato_verga = 743   
     			.totale_grammi_rottami = 3015.44
     			.verga_fonderia = 2973.1
     			.titolo_fonderia = 739
@@ -622,9 +696,12 @@
 			With sped
 				.kt = "bf7431f2b63449569d067c5705d24a67"
     			.banco_metalli_id = "a799419d-ae66-4174-986e-1da78274695a"
-    			.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
+    			'.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
     			.data_ddt = "24/11/2022"
     			.numero_ddt = 123
+				.totale_grammi_puro_stimato = 2236.29498
+				.verga_stimata = 3009
+				.titolo_stimato_verga = 743   
     			.totale_grammi_rottami = 3030.21
     			.verga_fonderia = 3008.9
     			.titolo_fonderia = 742
@@ -636,9 +713,12 @@
 			With sped
 				.kt = "a067b56f757841cb93af2a0482eb4451"
     			.banco_metalli_id = "c07cb0bc-f3c7-461f-ae7f-93b1430912db"
-    			.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
+    			'.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
     			.data_ddt = "02/12/2022"
     			.numero_ddt = 124
+				.totale_grammi_puro_stimato = 2205.51
+				.verga_stimata = 2967.58
+				.titolo_stimato_verga = 743   
     			.totale_grammi_rottami = 2988.5
     			.verga_fonderia = 2965.9
     			.titolo_fonderia = 740
@@ -716,12 +796,12 @@
 			tdNodeBM.setAttributeNode(attrClassFieldBM)
     		trNode.appendChild(tdNodeBM)
     		
-    		Set tdNodeTO = document.createElement("td")
-    		tdNodeTO.innerHTML = "<p> " + CStr(sped.titolo_oro_desc) + " </p> "
-    		Set attrClassFieldTO = document.createAttribute("class")
-			attrClassFieldTO.value = "spedizioni_field"
-			tdNodeTO.setAttributeNode(attrClassFieldTO)
-    		trNode.appendChild(tdNodeTO)
+    		'Set tdNodeTO = document.createElement("td")
+    		'tdNodeTO.innerHTML = "<p> " + CStr(sped.titolo_oro_desc) + " </p> "
+    		'Set attrClassFieldTO = document.createAttribute("class")
+			'attrClassFieldTO.value = "spedizioni_field"
+			'tdNodeTO.setAttributeNode(attrClassFieldTO)
+    		'trNode.appendChild(tdNodeTO)
 
     		Set tdNodeDDT = document.createElement("td")
     		tdNodeDDT.innerHTML = "<p> " + CStr(sped.numero_ddt) + " </p> "
@@ -772,12 +852,12 @@
 			tdNodeTGR.setAttributeNode(attrClassFieldTGR)
     		trNode.appendChild(tdNodeTGR)
 
-    		Set tdNodeTGP = document.createElement("td")
-    		tdNodeTGP.innerHTML = "<p> " + CStr(sped.totale_grammi_puro) + " </p> "
-    		Set attrClassFieldTGP = document.createAttribute("class")
-			attrClassFieldTGP.value = "spedizioni_field"
-			tdNodeTGP.setAttributeNode(attrClassFieldTGP)
-    		trNode.appendChild(tdNodeTGP)
+    		Set tdNodeTGPS = document.createElement("td")
+    		tdNodeTGPS.innerHTML = "<p> " + CStr(sped.totale_grammi_puro_stimato) + " </p> "
+    		Set attrClassFieldTGPS = document.createAttribute("class")
+			attrClassFieldTGPS.value = "spedizioni_field"
+			tdNodeTGPS.setAttributeNode(attrClassFieldTGPS)
+    		trNode.appendChild(tdNodeTGPS)
 
     		Set tdNodeVIP = document.createElement("td")
     		tdNodeVIP.innerHTML = "<p> " + CStr(sped.verga_fonderia) + " </p> "
@@ -874,54 +954,80 @@
 		Else 
 			sped.banco_metalli_desc = ""
 		End If
-		If todict.Exists(sped.titolo_oro_id) Then
-			Set toi = todict.Item(sped.titolo_oro_id)
-			sped.titolo_oro_desc = toi.desc
-			sped.totale_grammi_puro = Round(sped.totale_grammi_rottami * toi.coefficiente,2)
-			'sped.totale_grammi_rottami = sped.grammi_lordi
-			'sped.totale_grammi_puro = sped.grammi_puri_stimati
-			sped.verga_stimata = Round(sped.totale_grammi_rottami * 0.993,2)
-			If ( sped.totale_grammi_puro <> 0 And sped.verga_stimata <> 0 ) Then
-    			sped.titolo_stimato_verga = Round(( sped.totale_grammi_puro / sped.verga_stimata ) * 1000,2)
-    		Else 
-    			sped.titolo_stimato_verga = 0
-    		End If		
-			If (  sped.verga_fonderia <> 0 And sped.titolo_fonderia <> 0 ) Then
-    			sped.totale_grammi_puro_fonderia = Round(( sped.verga_fonderia * sped.titolo_fonderia ) / 1000,2)
-    		Else
-    			sped.totale_grammi_puro_fonderia = 0 
-    		End If
-    		sped.differenza_grammi = Round((sped.totale_grammi_puro_fonderia - sped.totale_grammi_puro),2)
-			If (  sped.differenza_grammi <> 0 And sped.totale_grammi_puro <> 0 ) Then
-        		sped.differenza_percentuale = Round((sped.differenza_grammi / sped.totale_grammi_puro) * 100 ,2)
-        	Else 
-        		sped.differenza_percentuale = 0
-        	End If
-			If (  sped.verga_fonderia <> 0 And sped.titolo_lab_controsaggio <> 0 ) Then
-	    		sped.puro_stimato_lab_controsaggio = Round(( sped.verga_fonderia * sped.titolo_lab_controsaggio ) / 1000,4)
-	    	Else 
-	    		sped.puro_stimato_lab_controsaggio = 0
-	    	End If
-    		sped.differenza_grammi_con_saggio = Round(sped.totale_grammi_puro_fonderia - sped.puro_stimato_lab_controsaggio,2)
+	
+		If (  sped.verga_fonderia <> 0 And sped.titolo_fonderia <> 0 ) Then
+    		sped.totale_grammi_puro_fonderia = Round(( sped.verga_fonderia * sped.titolo_fonderia ) / 1000,2)
+    	Else
+    		sped.totale_grammi_puro_fonderia = 0 
+    	End If
+    	sped.differenza_grammi = Round((sped.totale_grammi_puro_fonderia - sped.totale_grammi_puro_stimato),2)
+		If (  sped.differenza_grammi <> 0 And sped.totale_grammi_puro_stimato <> 0 ) Then
+        	sped.differenza_percentuale = Round((sped.differenza_grammi / sped.totale_grammi_puro_stimato) * 100 ,2)
+        Else 
+        	sped.differenza_percentuale = 0
+        End If
+		If (  sped.verga_fonderia <> 0 And sped.titolo_lab_controsaggio <> 0 ) Then
+	    	sped.puro_stimato_lab_controsaggio = Round(( sped.verga_fonderia * sped.titolo_lab_controsaggio ) / 1000,4)
+	    Else 
+	    	sped.puro_stimato_lab_controsaggio = 0
+	    End If
+    	sped.differenza_grammi_con_saggio = Round(sped.totale_grammi_puro_fonderia - sped.puro_stimato_lab_controsaggio,2)
     		
-			If (  sped.differenza_grammi_con_saggio <> 0 And sped.totale_grammi_puro <> 0 ) Then  
-    			sped.differenza_percentuale_con_saggio = Round((sped.differenza_grammi_con_saggio / sped.totale_grammi_puro) * 100 ,2)
-    		Else 
-    			sped.differenza_percentuale_con_saggio = 0
-    		End If
-		Else 
-			sped.titolo_oro_desc = ""
-			'sped.grammi_puri_stimati = 0
-			'sped.totale_grammi_rottami = 0
-			sped.totale_grammi_puro = 0
-			sped.verga_stimata = 0
-    		sped.titolo_stimato_verga = 0
-    		sped.totale_grammi_puro_fonderia = 0
-    		sped.differenza_grammi = 0
-    		sped.differenza_percentuale = 0
-    		sped.differenza_grammi_con_saggio = 0
+		If (  sped.differenza_grammi_con_saggio <> 0 And sped.totale_grammi_puro_stimato <> 0 ) Then  
+    		sped.differenza_percentuale_con_saggio = Round((sped.differenza_grammi_con_saggio / sped.totale_grammi_puro_stimato) * 100 ,2)
+    	Else 
     		sped.differenza_percentuale_con_saggio = 0
-		End If
+    	End If
+	End Sub
+
+	Sub displayAllTitoli()
+		Dim dett_spedizioni_table: Set dett_spedizioni_table = document.getElementById( "dett_spedizioni_table" )
+		clean_table(dett_spedizioni_table)
+		For Each i In todict.Keys
+    		Set titolo = todict.Item(i)
+    		displayTitolo(titolo)
+		Next
+    End Sub
+
+	Sub displayTitolo(titolo)
+	    Set tableNode = document.getElementById( "dett_spedizioni_table" )
+    	Set trNode = document.createElement("tr")
+    	Set attr = document.createAttribute("class")
+		attr.value = "speddettrow"
+		trNode.setAttributeNode(attr)
+
+    	Set attrClassField = document.createAttribute("class")
+		attrClassField.value = "spedizioni_field"
+    		
+    	Set tdNodeT = document.createElement("td")
+    	tdNodeT.innerHTML = "<p> " + titolo.desc + " </p> "    		
+    	Set attrClassFieldT = document.createAttribute("class")
+		attrClassFieldT.value = "dett_spedizioni_field"
+		tdNodeT.setAttributeNode(attrClassFieldT)
+    	trNode.appendChild(tdNodeT)
+
+    	Set tdNodeGL = document.createElement("td")
+    	Set inputGL = document.createElement("input")
+		inputGL.setAttribute "type", "text"
+		inputGL.value = 0
+    	tdNodeGL.appendChild(inputGL)    		
+    	Set attrClassFieldGL = document.createAttribute("class")
+		attrClassFieldGL.value = "dett_spedizioni_field"
+		tdNodeGL.setAttributeNode(attrClassFieldGL)
+    	trNode.appendChild(tdNodeGL)
+    		
+    	Set tdNodeGPS = document.createElement("td")
+    	Set inputGPS = document.createElement("input")
+		inputGPS.setAttribute "type", "text"
+		inputGPS.setAttribute "disabled", ""
+		inputGPS.value = 0
+    	tdNodeGPS.appendChild(inputGPS)    		
+    	Set attrClassFieldGPS = document.createAttribute("class")
+		attrClassFieldGPS.value = "dett_spedizioni_field"
+		tdNodeT.setAttributeNode(attrClassFieldGPS)
+    	trNode.appendChild(tdNodeGPS)
+    		
+    	tableNode.appendChild(trNode)
 	End Sub
 
 	Sub displayAllSpeds()
@@ -948,13 +1054,13 @@
 		
 		sped.kt = ""
 		sped.banco_metalli_id = ""
-		sped.titolo_oro_id = ""
+		'sped.titolo_oro_id = ""
 		sped.data_ddt = ""
 		sped.numero_ddt  = ""
 		'sped.grammi_lordi = 0
 		'sped.grammi_puri_stimati = 0
 		sped.totale_grammi_rottami = 0
-		sped.totale_grammi_puro = 0
+		sped.totale_grammi_puro_stimato = 0
 		sped.verga_stimata = 0
     	sped.titolo_stimato_verga = 0
     	sped.totale_grammi_puro_fonderia = 0
@@ -966,6 +1072,8 @@
     	sped.titolo_fonderia = 0
     	sped.titolo_lab_controsaggio = 0 
     	sped.puro_stimato_lab_controsaggio = 0
+    	
+    	getDettsOfSped("")
     	
 		add_sped()
 		SpedDetailDisplay(sped)
@@ -981,8 +1089,8 @@
     	show_mod_ins_sped()
     	Dim banco_metalli: Set banco_metalli = document.getElementById("banco_metalli")
     	BuildSelectBM(banco_metalli)
-    	Dim titolo_oro: Set titolo_oro = document.getElementById("titolo_oro_id")
-    	BuildSelectTO(titolo_oro)
+    	'Dim titolo_oro: Set titolo_oro = document.getElementById("titolo_oro_id")
+    	'BuildSelectTO(titolo_oro)
     	
     End Sub
     
@@ -1068,6 +1176,7 @@
 		If speddict.Exists(kt) Then
 			SpedErrorsCleared()
 			Set sped = speddict.Item(kt)
+			getDettsOfSped(kt)
 			add_sped()
 			SpedDetailDisplay(sped)
 		Else 

@@ -40,7 +40,10 @@ CONTEXTMENU="no"
 		getStoreTO()
 		getStoreBM()
 		getStoredSpeds()
+		getStoredSpedDetts()
 		displayAllSpeds()
+		window.resizeTo(1500,765);
+		initialSizeAndPos()
 	}
 	
 	function isNumberKey(evt) {
@@ -61,13 +64,14 @@ CONTEXTMENU="no"
 		insert_sped();
 		document.getElementById("banco_metalli").focus();
 	}
+	function add_det_sped_js() {
+		alert("TODO add_det_sped_js")
+	}
 	function delete_sped_js(kt) {
 		if (confirm("Confermi la cancellazione ?") == true) {
 			delete_sped(kt)
 		}
 	}
-	
-
 </script>
 
 </head>
@@ -108,7 +112,7 @@ CONTEXTMENU="no"
 	<div id="list_speds_container" >
 	<table cellspacing="0" cellpadding="0" id="spedizioni_table" >
 		<tr class="header_tr" >
-			<th class="header_sped" colspan="4" >Dati DDT</th>
+			<th class="header_sped" colspan="3" >Dati DDT</th>
 			<th class="header_sped" colspan="4" >Dati Verga</th>
 			<th class="header_sped" colspan="3" >Dati Verga Fonderia</th>
 			<th class="header_sped" colspan="2" >Laboratorio Controsaggio</th>
@@ -120,9 +124,11 @@ CONTEXTMENU="no"
 			<th class="header_sped" >
 				Banco Metalli
 			</th>
+			<!--
 			<th class="header_sped" >
 				Titolo Oro 
 			</th>
+			-->
 			<th class="header_sped" >
 				Numero DDT
 			</th>
@@ -137,18 +143,17 @@ CONTEXTMENU="no"
 				Gr Puri Stimati
 			</th>		
 			-->
-			
 			<th class="header_sped" >
-				Verga Stimata
-			</th>
+				Tot. Gr. Rottami
+			</th>			
 			<th class="header_sped" >
 				Tit. Stimato Verga
 			</th>
 			<th class="header_sped" >
-				Tot. Gr. Rottami
+				Verga Stimata
 			</th>
 			<th class="header_sped" >
-				Tot. Gr. Puro
+				Tot. Gr. Puro Stimato
 			</th>
 			
 			<th class="header_sped" >
@@ -214,122 +219,139 @@ CONTEXTMENU="no"
 							<div id="data_ddt_error" name="data_ddt_error" class="error_desc" ></div>
 						</label>
 					</div>
+					<!--
 					<div class="field_div">
 						<label class="label_div" for="titolo_oro_id">Titolo Oro<br/>
 							<select id="titolo_oro_id" name="titolo_oro_id" onchange="SpedDetailValidate()" ></select>
 							<div id="titolo_oro_id_error" name="titolo_oro_id_error" class="error_desc" ></div>
 						</label>
 					</div>
+					-->
 				</div>
 			</fieldset>
 			
-			<div>
-				<fieldset style="margin-bottom:10px;float:left;">
-					<legend>Dati Verga:</legend>
-					<div>
-						<div class="field_div">
-							<label class="label_div" for="totale_grammi_rottami">Totale Grammi Rottami <br/>
-								<input id="totale_grammi_rottami" name="totale_grammi_rottami" TYPE="TEXT" SIZE="15" onkeypress="return isDecimalKey(event)" onchange="SpedDetailValidate()"  >
-								<div id="totale_grammi_rottami_error" name="totale_grammi_rottami_error" class="error_desc" ></div>
+			<div style="position:relative;">
+				<div style="float:left;">
+					<fieldset style="margin-bottom:10px;border-radius: 5px;margin-right:50px;">
+						<legend>Titoli:</legend>			
+						<div>
+							<table cellspacing="0" cellpadding="0" id="dett_spedizioni_table" >
+								<tr class="header_tr" >
+									<th class="header_dett_sped" colspan="1" >Titolo Oro</th>
+									<th class="header_dett_sped" colspan="1" >Grammi Lordo</th>
+									<th class="header_dett_sped" colspan="1" >Grammi Puro Simati</th>
+								</tr>
+							</table>
+						</div>
+					</fieldset>
+				</div>		
+			
+				<div style="float:left;">
+					<fieldset style="margin-bottom:10px;">
+						<legend>Dati Verga:</legend>
+						<div>
+							<div class="field_div">
+								<label class="label_div" for="totale_grammi_rottami">Totale Grammi Rottami <br/>
+									<input id="totale_grammi_rottami" name="totale_grammi_rottami" TYPE="TEXT" SIZE="15" disabled >
+									<div id="totale_grammi_rottami_error" name="totale_grammi_rottami_error" class="error_desc" ></div>
+								</label>
+							</div>
+							<div class="field_div">
+								<label class="label_div" for="verga_stimata">Verga Stimata <br/>
+									<input id="verga_stimata" name="verga_stimata" TYPE="TEXT" SIZE="15" disabled >
+								</label>
+							</div>
+							<div class="field_div">
+								<label class="label_div" for="titolo_stimato_verga">Titolo Stimato Verga <br/>
+									<input id="titolo_stimato_verga" name="titolo_stimato_verga" TYPE="TEXT" SIZE="15" disabled >
+								</label>
+							</div>
+							<div class="field_div">
+								<label class="label_div" for="totale_grammi_puro_stimato">Totale Grammi Puro Stimato<br/>
+									<input id="totale_grammi_puro_stimato" name="totale_grammi_puro_stimato" TYPE="TEXT" SIZE="15" disabled >
+									<!--
+									<div id="totale_grammi_puro_error" name="totale_grammi_puro_error" class="error_desc" ></div>
+									-->
+								</label>
+							</div>
+						</div>
+					</fieldset>
+					<fieldset style="margin-bottom:10px;">
+						<legend>Dati Verga Fonderia :</legend>
+						<div>
+							<div class="field_div">
+								<label class="label_div" for="verga_fonderia">Verga<br/>
+									<input id="verga_fonderia" name="verga_fonderia" TYPE="TEXT" SIZE="15" onkeypress="return isDecimalKey(event)" onchange="SpedDetailValidate()"  >
+									<div id="verga_fonderia_error" name="verga_fonderia_error" class="error_desc" ></div>
+								</label>
+							</div>
+							<div class="field_div">
+								<label class="label_div" for="titolo_fonderia">Titolo <br/>
+									<input id="titolo_fonderia" name="titolo_fonderia" TYPE="TEXT" SIZE="15" onkeypress="return isDecimalKey(event)" onchange="SpedDetailValidate()"  >
+									<div id="titolo_fonderia_error" name="titolo_fonderia_error" class="error_desc" ></div>
+								</label>
+							</div>
+							<div class="field_div">
+								<label class="label_div" for="totale_grammi_puro_fonderia">Totale Grammi Puro <br/>
+									<input id="totale_grammi_puro_fonderia" name="totale_grammi_puro_fonderia" TYPE="TEXT" SIZE="15" disabled >
+								</label>
+							</div>
+						</div>
+					</fieldset>
+					<fieldset style="margin-bottom:10px;">
+						<legend>Dati Laboratorio Controdosaggio:</legend>
+						<div>
+							<div class="field_div">
+								<label class="label_div" for="titolo_lab_controsaggio">Titolo<br/>
+									<input id="titolo_lab_controsaggio" name="titolo_lab_controsaggio" TYPE="TEXT" SIZE="15" onkeypress="return isDecimalKey(event)" onchange="SpedDetailValidate()"  >
+									<div id="titolo_lab_controsaggio_error" name="titolo_lab_controsaggio_error" class="error_desc" ></div>
+								</label>
+							</div>
+							<div class="field_div">
+								<label class="label_div" for="puro_stimato_lab_controsaggio">Totale Grammi Puro <br/>
+									<input id="puro_stimato_lab_controsaggio" name="puro_stimato_lab_controsaggio" TYPE="TEXT" SIZE="15" disabled >
+								</label>
+							</div>
+						</div>
+					</fieldset>
+					<fieldset style="margin-bottom:10px;">
+						<legend>Dati Differenza tra Puro Stimato / Puro Fonderia :</legend>
+						<div class="field_div" >
+							<label class="label_div" for="">Differenza Grammi <br/>
+								<p id="differenza_grammi" name="differenza_grammi" style="padding:0px;background-color:#fb923c;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
 							</label>
 						</div>
-						<div class="field_div">
-							<label class="label_div" for="verga_stimata">Verga Stimata <br/>
-								<input id="verga_stimata" name="verga_stimata" TYPE="TEXT" SIZE="15" disabled >
+						<div class="field_div" >
+							<label class="label_div" for="">Differenza Percentuale <br/>
+								<p id="differenza_percentuale" name="differenza_percentuale" style="padding:0px;background-color:#fb923c;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
 							</label>
 						</div>
-						<div class="field_div">
-							<label class="label_div" for="titolo_stimato_verga">Titolo Stimato Verga <br/>
-								<input id="titolo_stimato_verga" name="titolo_stimato_verga" TYPE="TEXT" SIZE="15" disabled >
+					</fieldset>
+					<fieldset style="margin-bottom:10px;">
+						<legend>Dati Differenza  tra Puro Fonderia / Puro Laboratorio :</legend>
+						<div class="field_div" >
+							<label class="label_div" for="">Differenza Grammi <br/>
+								<p id="differenza_grammi_con_saggio" name="differenza_grammi_con_saggio" style="padding:0px;background-color:#fb923c;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
 							</label>
 						</div>
-						<div class="field_div">
-							<label class="label_div" for="totale_grammi_puro">Totale Grammi Puro <br/>
-								<input id="totale_grammi_puro" name="totale_grammi_puro" TYPE="TEXT" SIZE="15" disabled >
-								<!--
-								<div id="totale_grammi_puro_error" name="totale_grammi_puro_error" class="error_desc" ></div>
-								-->
+						<div class="field_div" >
+							<label class="label_div" for="">Differenza Percentuale <br/>
+								<p id="differenza_percentuale_con_saggio" name="differenza_percentuale_con_saggio" style="padding:0px;background-color:#fb923c;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
 							</label>
 						</div>
-					</div>
-				</fieldset>
-				<fieldset style="margin-bottom:10px;float:left;">
-					<legend>Dati Verga Fonderia:</legend>
-					<div>
-						<div class="field_div">
-							<label class="label_div" for="verga_fonderia">Verga<br/>
-								<input id="verga_fonderia" name="verga_fonderia" TYPE="TEXT" SIZE="15" onkeypress="return isDecimalKey(event)" onchange="SpedDetailValidate()"  >
-								<div id="verga_fonderia_error" name="verga_fonderia_error" class="error_desc" ></div>
-							</label>
-						</div>
-						<div class="field_div">
-							<label class="label_div" for="titolo_fonderia">Titolo <br/>
-								<input id="titolo_fonderia" name="titolo_fonderia" TYPE="TEXT" SIZE="15" onkeypress="return isDecimalKey(event)" onchange="SpedDetailValidate()"  >
-								<div id="titolo_fonderia_error" name="titolo_fonderia_error" class="error_desc" ></div>
-							</label>
-						</div>
-						<div class="field_div">
-							<label class="label_div" for="totale_grammi_puro_fonderia">Totale Grammi Puro <br/>
-								<input id="totale_grammi_puro_fonderia" name="totale_grammi_puro_fonderia" TYPE="TEXT" SIZE="15" disabled >
-							</label>
-						</div>
-					</div>
-				</fieldset>
-				<fieldset style="margin-bottom:10px;float:left;">
-					<legend>Dati Laboratorio Controdosaggio:</legend>
-					<div>
-						<div class="field_div">
-							<label class="label_div" for="titolo_lab_controsaggio">Titolo<br/>
-								<input id="titolo_lab_controsaggio" name="titolo_lab_controsaggio" TYPE="TEXT" SIZE="15" onkeypress="return isDecimalKey(event)" onchange="SpedDetailValidate()"  >
-								<div id="titolo_lab_controsaggio_error" name="titolo_lab_controsaggio_error" class="error_desc" ></div>
-							</label>
-						</div>
-						<div class="field_div">
-							<label class="label_div" for="puro_stimato_lab_controsaggio">Totale Grammi Puro <br/>
-								<input id="puro_stimato_lab_controsaggio" name="puro_stimato_lab_controsaggio" TYPE="TEXT" SIZE="15" disabled >
-							</label>
-						</div>
-					</div>
-				</fieldset>
+					</fieldset>
+					<div style="clear:both;">
+					</div>	
+				</div>
+				<div style="float: right;">
+					<div  style="position:absolute;right:0;bottom:0">
+						<input name="Submit" type="submit" VALUE="Conferma">
+						<button name="back_to_list" type="button" onclick="show_speds_list()">Annulla</button>
+					</div> 		
+				</div>		
 				<div style="clear:both;">
 				</div>	
-			</div>
-
-			<div>
-				<fieldset style="margin-bottom:10px;float:left;">
-					<legend>Dati Differenza:</legend>
-					<div class="field_div" >
-						<label class="label_div" for="">Differenza Grammi <br/>
-							<p id="differenza_grammi" name="differenza_grammi" style="padding:0px;background-color:#fb923c;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
-						</label>
-					</div>
-					<div class="field_div" >
-						<label class="label_div" for="">Differenza Percentuale <br/>
-							<p id="differenza_percentuale" name="differenza_percentuale" style="padding:0px;background-color:#fb923c;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
-						</label>
-					</div>
-				</fieldset>
-				<fieldset style="margin-bottom:10px;float:left;">
-					<legend>Dati Differenza Laboratorio:</legend>
-					<div class="field_div" >
-						<label class="label_div" for="">Differenza Grammi <br/>
-							<p id="differenza_grammi_con_saggio" name="differenza_grammi_con_saggio" style="padding:0px;background-color:#fb923c;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
-						</label>
-					</div>
-					<div class="field_div" >
-						<label class="label_div" for="">Differenza Percentuale <br/>
-							<p id="differenza_percentuale_con_saggio" name="differenza_percentuale_con_saggio" style="padding:0px;background-color:#fb923c;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
-						</label>
-					</div>
-				</fieldset>
-				<div style="clear:both;">
-				</div>	
-			</div>
-						
-			<div style="clear:both;float: right;">
-				<input name="Submit" type="submit" VALUE="Conferma">
-				<button name="back_to_list" type="button" onclick="show_speds_list()">Annulla</button> 		
-			</div>		
+			</div>						
 		</form>		
 	</div>
 </div>

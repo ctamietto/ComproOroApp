@@ -68,6 +68,10 @@ select {
   background: rgb(255, 240, 179);
 }
 
+.speddettrow:hover {
+  background: rgb(255, 240, 179);
+}
+
 .icon_style {
 	font-size:28px;
 	color:#7A6D63;
@@ -84,6 +88,10 @@ select {
   border-Right: 1px solid #fb923c;
 }
 
+.header_dett_sped {
+  border-Right: 1px solid #fb923c;
+}
+
 .field_div {
 	padding-bottom:5px;
 	float: left;
@@ -97,6 +105,12 @@ select {
 
 .spedizioni_field {
 	text-align: center;
+}
+
+.dett_spedizioni_field {
+	text-align: center;
+	margin: 0px;
+	padding: 0px;
 }
 
 .field_div {
