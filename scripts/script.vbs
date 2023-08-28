@@ -72,6 +72,7 @@
 		isNewRecord = False
 				
 		Call SpedDetailGet(sped,isNewRecord,False)
+		TitoliCalcTotaliSped(sped)
 		calcSped(sped) 
 		SpedDetailDisplay(sped)
     End Sub
@@ -112,7 +113,6 @@
 		spedDest.differenza_percentuale_con_saggio = spedSrc.differenza_percentuale_con_saggio
 	
     End Sub
-    
 
 	Sub SpedDetailGet(ByRef sped,ByRef isNewRecord,genKT)
 		'MsgBox "init SpedDetailGet"
@@ -346,7 +346,9 @@
 				isNewRecord = True
 			End If
 		End If
-
+		
+		TitoliSpedGet(sped)
+		
     End Sub
 		
 	Sub SpedDetailDisplay(sped)
@@ -521,8 +523,9 @@
 		
 		Set kt = document.getElementById( "kt" )
 		kt.value = sped.kt
-		
+
 		displayAllTitoli()
+		
 		
     End Sub
 	
@@ -603,7 +606,7 @@
 				.kt = "b71d8c09-2351-4c04-8087-c9d7c7876e12"
     			.desc = "500"
     			.coefficiente = 0.475
-    			.coefficiente_titolo_stimato = 0.99    			
+    			.coefficiente_titolo_stimato = 0.99  			
 			End With
 			todict.Add toi.kt, toi
 
@@ -636,6 +639,7 @@
 			.fk = "edfc686e267e4a8daa434ee9577e81c8"
     		.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
     		.grammi_lordi = 3015.44
+    		.grammi_puro_stimati = 3000.44 
 		End With	
 		speddetdict.Add speddet.kt, speddet
 		
@@ -646,6 +650,7 @@
 			.fk = "bf7431f2b63449569d067c5705d24a67"
     		.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
     		.grammi_lordi = 3030.21
+    		.grammi_puro_stimati = 3000.33 
 		End With	
 		speddetdict.Add speddet.kt, speddet
 		
@@ -656,8 +661,36 @@
 			.fk = "a067b56f757841cb93af2a0482eb4451"
     		.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
     		.grammi_lordi = 2988.5
+    		.grammi_puro_stimati = 2930.8 
 		End With	
 		speddetdict.Add speddet.kt, speddet
+    End Sub
+
+	Rem rimuovi tutte le occorrenze del dettaglio di una spedizione ( legate ad una foreign key )
+	Sub removeDettsOfSpedFK(fk)
+		For Each i In speddetdict.Keys
+			Set speddet = speddetdict.Item(i)
+			If (speddet.fk = fk) Then
+				speddetdict.Remove(i)
+			End If
+		Next 
+    End Sub
+    
+    Sub storeCurDettsOfSped() 
+		For Each i In currspeddetdict.Keys
+			Set titolodett = currspeddetdict.Item(i)
+			speddetdict.Add titolodett.kt, titolodett
+		Next 
+		currspeddetdict.RemoveAll()
+    End Sub 
+
+	Sub SpedDettTitoloCopy(ByRef DettTitoloDest,DettTitoloSrc)
+		DettTitoloDest.kt = DettTitoloSrc.kt
+		DettTitoloDest.fk = DettTitoloSrc.fk
+		DettTitoloDest.titolo_oro_id = DettTitoloSrc.titolo_oro_id
+		DettTitoloDest.titolo_oro_desc = DettTitoloSrc.titolo_oro_desc
+		DettTitoloDest.grammi_lordi = DettTitoloSrc.grammi_lordi
+		DettTitoloDest.grammi_puro_stimati = DettTitoloSrc.grammi_puro_stimati		
     End Sub
 
 	Sub getDettsOfSped(fk)
@@ -666,7 +699,9 @@
 			For Each i In speddetdict.Keys
     			Set csddi = speddetdict.Item(i)
     			If ( csddi.fk = fk ) Then
-    				currspeddetdict.Add csddi.kt, csddi
+    				Dim speddetcopy: Set speddetcopy = new speddetclass
+					Call SpedDettTitoloCopy(speddetcopy,csddi)
+    				currspeddetdict.Add speddetcopy.kt, speddetcopy
     			End If 
 			Next
 		End If      	
@@ -831,20 +866,6 @@
 			'tdNodeGPS.setAttributeNode(attrClassFieldGPS)
     		'trNode.appendChild(tdNodeGPS)
     		
-    		Set tdNodeVS = document.createElement("td")
-    		tdNodeVS.innerHTML = "<p> " + CStr(sped.verga_stimata) + " </p> "
-    		Set attrClassFieldVS = document.createAttribute("class")
-			attrClassFieldVS.value = "spedizioni_field"
-			tdNodeVS.setAttributeNode(attrClassFieldVS)
-    		trNode.appendChild(tdNodeVS)
-    		
-    		Set tdNodeTSV = document.createElement("td")
-    		tdNodeTSV.innerHTML = "<p> " + CStr(sped.titolo_stimato_verga) + " </p> "
-    		Set attrClassFieldTSV = document.createAttribute("class")
-			attrClassFieldTSV.value = "spedizioni_field"
-			tdNodeTSV.setAttributeNode(attrClassFieldTSV)
-    		trNode.appendChild(tdNodeTSV)
-    		
     		Set tdNodeTGR = document.createElement("td")
     		tdNodeTGR.innerHTML = "<p> " + CStr(sped.totale_grammi_rottami) + " </p> "
     		Set attrClassFieldTGR = document.createAttribute("class")
@@ -852,6 +873,20 @@
 			tdNodeTGR.setAttributeNode(attrClassFieldTGR)
     		trNode.appendChild(tdNodeTGR)
 
+    		Set tdNodeTSV = document.createElement("td")
+    		tdNodeTSV.innerHTML = "<p> " + CStr(sped.titolo_stimato_verga) + " </p> "
+    		Set attrClassFieldTSV = document.createAttribute("class")
+			attrClassFieldTSV.value = "spedizioni_field"
+			tdNodeTSV.setAttributeNode(attrClassFieldTSV)
+    		trNode.appendChild(tdNodeTSV)
+
+    		Set tdNodeVS = document.createElement("td")
+    		tdNodeVS.innerHTML = "<p> " + CStr(sped.verga_stimata) + " </p> "
+    		Set attrClassFieldVS = document.createAttribute("class")
+			attrClassFieldVS.value = "spedizioni_field"
+			tdNodeVS.setAttributeNode(attrClassFieldVS)
+    		trNode.appendChild(tdNodeVS)
+    		    		
     		Set tdNodeTGPS = document.createElement("td")
     		tdNodeTGPS.innerHTML = "<p> " + CStr(sped.totale_grammi_puro_stimato) + " </p> "
     		Set attrClassFieldTGPS = document.createAttribute("class")
@@ -988,6 +1023,81 @@
     		displayTitolo(titolo)
 		Next
     End Sub
+        
+    Sub TitoliCalcTotaliSped(sped)
+    	sped.verga_stimata = 0
+    	sped.titolo_stimato_verga = 0
+    	sped.totale_grammi_rottami = 0
+    	sped.totale_grammi_puro_stimato = 0
+    	
+    	For Each j In currspeddetdict.Keys
+    		Set titolodett = currspeddetdict.Item(j)
+    		Set titolo = todict.Item(titolodett.titolo_oro_id)
+    		
+    		sped.verga_stimata = sped.verga_stimata + ( titolodett.grammi_lordi * titolo.coefficiente_titolo_stimato )
+    		sped.totale_grammi_rottami = sped.totale_grammi_rottami + titolodett.grammi_lordi
+    		sped.totale_grammi_puro_stimato = sped.totale_grammi_puro_stimato + titolodett.grammi_puro_stimati
+    	Next
+    	If ( sped.totale_grammi_puro_stimato > 0 And sped.verga_stimata > 0 ) Then 
+    		sped.titolo_stimato_verga = sped.totale_grammi_puro_stimato / sped.verga_stimata  * 1000 
+    	End If 
+    	
+    	
+    	sped.verga_stimata = Round(sped.verga_stimata,2)
+    	sped.titolo_stimato_verga = Round(sped.titolo_stimato_verga,2)
+    	sped.totale_grammi_rottami = Round(sped.totale_grammi_rottami,2)
+    	sped.totale_grammi_puro_stimato = Round(sped.totale_grammi_puro_stimato,2)
+    	
+    End Sub
+        
+	Sub TitoliSpedGet(sped)
+		For Each i In todict.Keys
+    		Set titolo = todict.Item(i)
+    		Set glel = document.getElementById( titolo.kt )
+    		grammiLordo = 0
+    		currentTitoloIndex = 0
+    		foundCurrentTitoloIndex = false
+    		
+    		If (IsNull(glel.value) Or IsEmpty(glel.value) Or glel.value = "") Then
+				grammiLordo = 0
+			Else 
+				grammiLordo  = CDbl(glel.value)  
+			End If		
+
+			For Each j In currspeddetdict.Keys
+				Set titolodett = currspeddetdict.Item(j)
+				If (titolodett.titolo_oro_id = titolo.kt) Then
+					currentTitoloIndex = j
+					foundCurrentTitoloIndex = True
+				End If
+			Next 
+
+			If (foundCurrentTitoloIndex) Then 
+				Set titolodettold = currspeddetdict.Item(currentTitoloIndex)
+				If (grammiLordo > 0 ) Then 
+					titolodettold.grammi_lordi = grammiLordo
+					Rem todo calcola grammi_puro_stimati
+					titolodettold.grammi_puro_stimati = Round(grammiLordo * titolo.coefficiente,2)
+				Else 
+					currspeddetdict.Remove(currentTitoloIndex)
+				End If
+			Else 
+				If (grammiLordo > 0 ) Then 
+					Dim titolodettnew: Set titolodettnew = new speddetclass	
+					titolodettnew.kt = CreateGUID()
+					titolodettnew.fk = sped.kt
+					titolodettnew.titolo_oro_id = titolo.kt
+					titolodettnew.titolo_oro_desc = titolo.desc
+					titolodettnew.grammi_lordi = grammiLordo
+					Rem todo calcola grammi_puro_stimati
+					titolodettnew.grammi_puro_stimati = Round(grammiLordo * titolo.coefficiente,2)
+					currspeddetdict.Add titolodettnew.kt, titolodettnew
+				Else 
+					Rem niente da fare 
+				End If 
+			End If     		
+		Next
+    End Sub
 
 	Sub displayTitolo(titolo)
 	    Set tableNode = document.getElementById( "dett_spedizioni_table" )
@@ -1008,7 +1118,9 @@
 
     	Set tdNodeGL = document.createElement("td")
     	Set inputGL = document.createElement("input")
+		inputGL.setAttribute "id",titolo.kt
 		inputGL.setAttribute "type", "text"
+		inputGL.setAttribute "onchange" , "SpedDetailValidate()"
 		inputGL.value = 0
     	tdNodeGL.appendChild(inputGL)    		
     	Set attrClassFieldGL = document.createAttribute("class")
@@ -1026,7 +1138,16 @@
 		attrClassFieldGPS.value = "dett_spedizioni_field"
 		tdNodeT.setAttributeNode(attrClassFieldGPS)
     	trNode.appendChild(tdNodeGPS)
-    		
+
+		Rem ricerca il titolo nell'elenco dei dettaglio corrente dei titolo
+		For Each i In currspeddetdict.Keys
+    		Set csd = currspeddetdict.Item(i)
+			If (csd.titolo_oro_id = titolo.kt) Then
+				inputGL.value = csd.grammi_lordi
+				inputGPS.value = csd.grammi_puro_stimati
+			End If 
+		Next
+	
     	tableNode.appendChild(trNode)
 	End Sub
 
@@ -1112,6 +1233,7 @@
 		isNewRecord = False
 				
 		Call SpedDetailGet(sped,isNewRecord,True)
+		TitoliCalcTotaliSped(sped)
 		calcSped(sped) 
 		existErrors = SpedErrorsStatus()
 
@@ -1128,6 +1250,11 @@
 				'MsgBox "aggiungo record sped con chiave '" + sped.kt + "'"
  				speddict.Add sped.kt, sped
 			End If 
+			
+			Rem aggiungo i dettagli sui titoli della spedizione
+			Rem prima li rimuovo tutti e poi li aggiungo
+			removeDettsOfSpedFK(sped.kt)
+			storeCurDettsOfSped()
 
 			Dim spedizioni_table: Set spedizioni_table = document.getElementById( "spedizioni_table" )
 			clean_table(spedizioni_table)
@@ -1167,6 +1294,7 @@
 		
 	Sub delete_sped(kt)
 		del_from_dict_sped(kt)
+		removeDettsOfSpedFK(kt)
 		Dim spedizioni_table: Set spedizioni_table = document.getElementById( "spedizioni_table" )
 		clean_table(spedizioni_table)
 		displayAllSpeds()
