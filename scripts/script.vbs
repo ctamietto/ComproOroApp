@@ -1300,6 +1300,10 @@
 		displayAllSpeds()
 	End Sub
 
+	Sub modify_bm(kt)
+		MsgBox "Funzione modifica banco metalli non ancora implementata"
+	End Sub
+
 	Sub modify_sped(kt)
 		If speddict.Exists(kt) Then
 			SpedErrorsCleared()
@@ -1432,3 +1436,39 @@
 		End Select
 	End Sub
  
+ 	Sub displayBM(bm)
+ 	
+ 		Set tableNode = document.getElementById( "bm_table" )
+    	Set trNode = document.createElement("tr")
+    	Set attr = document.createAttribute("class")
+		attr.value = "bmrow"
+		trNode.setAttributeNode(attr)
+    		
+    	Set tdNodeDesc = document.createElement("td")
+    	tdNodeDesc.innerHTML = "<p> " + CStr(bm.desc) + " </p> "    		
+    	Set attrClassFieldDesc = document.createAttribute("class")
+		attrClassFieldDesc.value = "bm_field"
+		tdNodeDesc.setAttributeNode(attrClassFieldDesc)
+    	trNode.appendChild(tdNodeDesc)
+    	    	
+    	Set iMNode = document.createElement("i")
+    	Set attrClass = document.createAttribute("class")
+		attrClass.value = "fa fa-sharp fa-solid fa-pencil icon_style"
+		iMNode.setAttributeNode(attrClass)
+    	Set attrOnClick = document.createAttribute("onClick")
+		attrOnClick.value = "modify_bm('" + CStr(bm.kt) + "')"
+		iMNode.setAttributeNode(attrOnClick)			
+    	Set tdNodeMR = document.createElement("td")
+    	tdNodeMR.appendChild(iMNode) 
+    	trNode.appendChild(tdNodeMR) 
+
+    	tableNode.appendChild(trNode)
+ 	End Sub
+ 
+ 
+ 	Sub displayAllBM()
+		For Each i In bmdict.Keys
+    		Set bm = bmdict.Item(i)
+    		displayBM(bm)
+		Next
+    End Sub

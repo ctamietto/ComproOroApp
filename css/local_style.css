@@ -68,6 +68,10 @@ select {
   background: rgb(255, 240, 179);
 }
 
+.bmrow:hover {
+  background: rgb(255, 240, 179);
+}
+
 .speddettrow:hover {
   background: rgb(255, 240, 179);
 }
@@ -84,7 +88,7 @@ select {
 	text-shadow:2px 2px 4px #000000;
 }
 
-.header_sped {
+.header_sped .header_bm {
   border-Right: 1px solid #fb923c;
 }
 
@@ -105,6 +109,10 @@ select {
 
 .spedizioni_field {
 	text-align: center;
+}
+
+.bm_field {
+	text-align: left;
 }
 
 .dett_spedizioni_field {
@@ -173,4 +181,12 @@ select {
 
 #spedizioni_table {
 	width:100%
+}
+
+#list_banco_metalli_container {
+	margin: 15px;
+}
+
+#bm_table {
+	width:50%
 }

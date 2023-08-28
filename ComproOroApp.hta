@@ -42,6 +42,7 @@ CONTEXTMENU="no"
 		getStoredSpeds()
 		getStoredSpedDetts()
 		displayAllSpeds()
+		displayAllBM()
 		window.resizeTo(1500,765);
 		initialSizeAndPos()
 	}
@@ -60,6 +61,11 @@ CONTEXTMENU="no"
     	}
   		return true;
 	}
+	
+	function add_bm_js() {
+		alert("funzione aggiunta banco metalli ancora da implementare")
+	}
+	
 	function add_sped_js() {
 		insert_sped();
 		document.getElementById("banco_metalli").focus();
@@ -102,7 +108,16 @@ CONTEXTMENU="no"
 
 <div id="banco_metalli_section"  style="display:none" >
 	<div id="list_banco_metalli_container">
-		TODO LIST CONTAINER
+		<table cellspacing="0" cellpadding="0" id="bm_table" >
+			<tr class="header_tr" >
+				<th class="header_bm" width="90%" >Ragione Sociale</th>
+				
+				<th colspan="1" class="header_bm"  width="10%" >
+					<i style="top:20px" id="add_bm" class="fa fa-sharp fa-solid fa-plus icon_style_diff" onClick="add_bm_js()" ></i>
+				</th>
+
+			</tr>
+		</table>
 	</div>
 </div>
 
