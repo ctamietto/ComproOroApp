@@ -72,6 +72,10 @@ select {
   background: rgb(255, 240, 179);
 }
 
+.torow:hover {
+  background: rgb(255, 240, 179);
+}
+
 .speddettrow:hover {
   background: rgb(255, 240, 179);
 }
@@ -88,7 +92,7 @@ select {
 	text-shadow:2px 2px 4px #000000;
 }
 
-.header_sped .header_bm {
+.header_sped .header_bm header_to. {
   border-Right: 1px solid #fb923c;
 }
 
@@ -113,6 +117,14 @@ select {
 
 .bm_field {
 	text-align: left;
+}
+
+.to_field {
+	text-align: left;
+}
+
+.to_field_number  {
+	text-align: right;
 }
 
 .dett_spedizioni_field {
@@ -187,6 +199,16 @@ select {
 	margin: 15px;
 }
 
+#list_titoli_container {
+	margin: 15px;
+}
+
 #bm_table {
 	width:50%
 }
+
+#to_table {
+	width:50%
+}
+
+

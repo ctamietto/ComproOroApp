@@ -43,6 +43,7 @@ CONTEXTMENU="no"
 		getStoredSpedDetts()
 		displayAllSpeds()
 		displayAllBM()
+		displayAllTO()
 		window.resizeTo(1500,765);
 		initialSizeAndPos()
 	}
@@ -60,6 +61,10 @@ CONTEXTMENU="no"
   			return isNumberKey(evt);
     	}
   		return true;
+	}
+
+	function add_to_js() {
+		alert("funzione aggiunta titolo ancora da implementare")
 	}
 	
 	function add_bm_js() {
@@ -102,7 +107,18 @@ CONTEXTMENU="no"
 
 <div id="titoli_section" style="display:none" >
 	<div id="list_titoli_container">
-		TODO LIST TITOLI
+		<table cellspacing="0" cellpadding="0" id="to_table" >
+			<tr class="header_tr" >
+				<th class="header_to"  >Titolo</th>
+				<th class="header_to"  >Coefficiente</th>
+				<th class="header_to"  >Coefficiente Titolo Stimato</th>
+				
+				<th colspan="1" class="header_to" >
+					<i style="top:20px" id="add_to" class="fa fa-sharp fa-solid fa-plus icon_style_diff" onClick="add_to_js()" ></i>
+				</th>
+
+			</tr>
+		</table>
 	</div>
 </div>
 

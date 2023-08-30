@@ -1304,6 +1304,10 @@
 		MsgBox "Funzione modifica banco metalli non ancora implementata"
 	End Sub
 
+	Sub modify_titolo(kt)
+		MsgBox "Funzione modifica titolo non ancora implementata"
+	End Sub
+
 	Sub modify_sped(kt)
 		If speddict.Exists(kt) Then
 			SpedErrorsCleared()
@@ -1471,4 +1475,54 @@
     		Set bm = bmdict.Item(i)
     		displayBM(bm)
 		Next
+    End Sub
+    
+     Sub displayAllTO()
+		For Each i In todict.Keys
+    		Set titolo = todict.Item(i)
+    		displayTO(titolo)
+		Next
+    End Sub
+    
+    Sub displayTO(titolo)
+ 		Set tableNode = document.getElementById( "to_table" )
+    	Set trNode = document.createElement("tr")
+    	Set attr = document.createAttribute("class")
+		attr.value = "torow"
+		trNode.setAttributeNode(attr)
+		
+    	Set tdNodeDesc = document.createElement("td")
+    	tdNodeDesc.innerHTML = "<p> " + CStr(titolo.desc) + " </p> "    		
+    	Set attrClassFieldDesc = document.createAttribute("class")
+		attrClassFieldDesc.value = "to_field"
+		tdNodeDesc.setAttributeNode(attrClassFieldDesc)
+    	trNode.appendChild(tdNodeDesc)
+		
+		Set tdNodeCoeff = document.createElement("td")
+    	tdNodeCoeff.innerHTML = " <p> " + CStr(titolo.coefficiente) + " </p> "
+    	Set attrClassFieldCoeff = document.createAttribute("class")
+		attrClassFieldCoeff.value = "to_field_number"
+		tdNodeCoeff.setAttributeNode(attrClassFieldCoeff)
+    	trNode.appendChild(tdNodeCoeff)
+		
+		Set tdNodeCoeffTS = document.createElement("td")
+    	tdNodeCoeffTS.innerHTML = " <p> " + CStr(titolo.coefficiente_titolo_stimato) + " </p> "
+    	Set attrClassFieldCoeffTS = document.createAttribute("class")
+		attrClassFieldCoeffTS.value = "to_field_number"
+		tdNodeCoeffTS.setAttributeNode(attrClassFieldCoeffTS)
+    	trNode.appendChild(tdNodeCoeffTS)
+
+    	Set iMNode = document.createElement("i")
+    	Set attrClass = document.createAttribute("class")
+		attrClass.value = "fa fa-sharp fa-solid fa-pencil icon_style"
+		iMNode.setAttributeNode(attrClass)
+    	Set attrOnClick = document.createAttribute("onClick")
+		attrOnClick.value = "modify_titolo('" + CStr(titolo.kt) + "')"
+		iMNode.setAttributeNode(attrOnClick)			
+    	Set tdNodeMR = document.createElement("td")
+    	tdNodeMR.appendChild(iMNode) 
+    	trNode.appendChild(tdNodeMR) 
+		
+    	tableNode.appendChild(trNode)
+		
     End Sub
