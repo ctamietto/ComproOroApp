@@ -1,4 +1,4 @@
-	'Dim kt as string
+	'rem versione 20230831_001
 		
 	' testata spedizione
 	Class spedclass
@@ -638,8 +638,8 @@
 			.kt = "94da5c56-0c30-477a-bc24-ac603a30e3c7"
 			.fk = "edfc686e267e4a8daa434ee9577e81c8"
     		.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
-    		.grammi_lordi = 3015.44
-    		.grammi_puro_stimati = 3000.44 
+    		.grammi_lordi = 3000
+    		.grammi_puro_stimati = 2214 
 		End With	
 		speddetdict.Add speddet.kt, speddet
 		
@@ -649,8 +649,8 @@
 			.kt = "cd1cdfa0-bafb-4362-b3ca-0efa035bee97"
 			.fk = "bf7431f2b63449569d067c5705d24a67"
     		.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
-    		.grammi_lordi = 3030.21
-    		.grammi_puro_stimati = 3000.33 
+    		.grammi_lordi = 2950
+    		.grammi_puro_stimati = 2177.1 
 		End With	
 		speddetdict.Add speddet.kt, speddet
 		
@@ -660,8 +660,8 @@
 			.kt = "32cf79e5-a2c8-4e22-9273-6fd04cde5a2c"
 			.fk = "a067b56f757841cb93af2a0482eb4451"
     		.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
-    		.grammi_lordi = 2988.5
-    		.grammi_puro_stimati = 2930.8 
+    		.grammi_lordi = 2999
+    		.grammi_puro_stimati = 2213.26
 		End With	
 		speddetdict.Add speddet.kt, speddet
     End Sub
@@ -714,13 +714,12 @@
 			With sped
 				.kt = "edfc686e267e4a8daa434ee9577e81c8"
     			.banco_metalli_id = "c07cb0bc-f3c7-461f-ae7f-93b1430912db"
-    			'.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
     			.data_ddt = "17/11/2022"
     			.numero_ddt = 122
-				.totale_grammi_puro_stimato = 2225.39
-				.verga_stimata = 2994.33
-				.titolo_stimato_verga = 743   
-    			.totale_grammi_rottami = 3015.44
+				.totale_grammi_puro_stimato = 2214
+				.verga_stimata = 2976
+				.titolo_stimato_verga = 743.95   
+    			.totale_grammi_rottami = 3000
     			.verga_fonderia = 2973.1
     			.titolo_fonderia = 739
     			.titolo_lab_controsaggio = 742
@@ -731,13 +730,12 @@
 			With sped
 				.kt = "bf7431f2b63449569d067c5705d24a67"
     			.banco_metalli_id = "a799419d-ae66-4174-986e-1da78274695a"
-    			'.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
     			.data_ddt = "24/11/2022"
     			.numero_ddt = 123
-				.totale_grammi_puro_stimato = 2236.29498
-				.verga_stimata = 3009
-				.titolo_stimato_verga = 743   
-    			.totale_grammi_rottami = 3030.21
+				.totale_grammi_puro_stimato = 2177.1
+				.verga_stimata = 2926.4
+				.titolo_stimato_verga = 743.95 
+    			.totale_grammi_rottami = 2950
     			.verga_fonderia = 3008.9
     			.titolo_fonderia = 742
     			.titolo_lab_controsaggio = 743
@@ -748,13 +746,12 @@
 			With sped
 				.kt = "a067b56f757841cb93af2a0482eb4451"
     			.banco_metalli_id = "c07cb0bc-f3c7-461f-ae7f-93b1430912db"
-    			'.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
     			.data_ddt = "02/12/2022"
     			.numero_ddt = 124
-				.totale_grammi_puro_stimato = 2205.51
-				.verga_stimata = 2967.58
-				.titolo_stimato_verga = 743   
-    			.totale_grammi_rottami = 2988.5
+				.totale_grammi_puro_stimato = 2213.26
+				.verga_stimata = 2975.01
+				.titolo_stimato_verga = 743.95   
+    			.totale_grammi_rottami = 2999
     			.verga_fonderia = 2965.9
     			.titolo_fonderia = 740
     			.titolo_lab_controsaggio = 743    			
@@ -1253,6 +1250,14 @@
 			
 			Rem aggiungo i dettagli sui titoli della spedizione
 			Rem prima li rimuovo tutti e poi li aggiungo
+			If (isNewRecord) Then 
+				Rem aggiungi la foreign key della spedizione ai dettagli   
+				For Each i In currspeddetdict.Keys
+					Set titolodett = currspeddetdict.Item(i)
+					titolodett.fk = sped.kt
+				Next 
+			End If 
+			
 			removeDettsOfSpedFK(sped.kt)
 			storeCurDettsOfSped()
 
