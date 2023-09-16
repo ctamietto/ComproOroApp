@@ -19,6 +19,7 @@ table {border: none;}
 th {
   padding : 15px;
   border-bottom: 2px solid #fb923c;
+  border-right: 2px solid #fb923c;	
   background-color: #7A6D63;
   color:white;
 }

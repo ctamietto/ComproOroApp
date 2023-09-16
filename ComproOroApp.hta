@@ -19,24 +19,29 @@
 
 
 <HTA:APPLICATION
-ID="Gestione Spedizioni"
+ID="objGestSped"
 INNERBORDER="no"
 CONTEXTMENU="no"
 />
 
+
 <script language="VBScript" src="scripts/script.vbs" />
 
-<script language="VBScript">
-	Sub window_onLoad()
-		'This method will be called when the application loads
-		'Add your code here
-		MsgBox "started"
-		getSped()
+<script	 language="VBScript">
+	Sub Window_onLoad
+    	arrCommands = Split(objGestSped.commandLine, chr(34))    	
+    	MsgBox arrCommands
+    	Rem For i = 3 to (Ubound(arrCommands) – 1) Step 2
+        Rem 	MsgBox arrCommands(i)
+   	 	Rem Next
 	End Sub
 </script>
 
+
+
 <script>
 	function DoStartup() {
+		getCLParameter()
 		getStoreTO()
 		getStoreBM()
 		getStoredSpeds()
@@ -46,6 +51,10 @@ CONTEXTMENU="no"
 		displayAllTO()
 		window.resizeTo(1500,765);
 		initialSizeAndPos()
+		if (isAdministrator()) {
+			alert("sono amministratore")
+		}
+		
 	}
 	
 	function isNumberKey(evt) {
@@ -68,7 +77,7 @@ CONTEXTMENU="no"
 	}
 	
 	function add_bm_js() {
-		alert("funzione aggiunta banco metalli ancora da implementare")
+		add_bm()
 	}
 	
 	function add_sped_js() {
@@ -135,7 +144,32 @@ CONTEXTMENU="no"
 			</tr>
 		</table>
 	</div>
+	<div id="mod_add_banco_metalli_container"  style="display:none;margin:20px" >
+		<form id="ValidForm" onsubmit="submit_bm(); return false;">
+			<input type="hidden" id="ktbm" name="ktbm" >
+			<fieldset style="margin-bottom:10px;border-radius: 5px;">
+				<legend>Dati Angrafici:</legend>
+				<div>
+					<div class="field_div">
+						<label class="label_div" for="bm_ragione_sociale">Ragione Sociale <br/>
+							<input id="bm_ragione_sociale" name="bm_ragione_sociale" TYPE="TEXT" SIZE="200" onchange="BMDetailValidate()"  >
+							<div id="bm_ragione_sociale_error" name="bm_ragione_sociale_error" class="error_desc" ></div>
+						</label>
+					</div>
+				</div>
+			</fieldset>
+			<div style="float: right;">
+				<div>
+					<input name="Submit" type="submit" VALUE="Conferma">
+					<button name="back_to_list" type="button" onclick="show_bm_list()">Annulla</button>
+				</div> 		
+			</div>		
+			<div style="clear:both;">
+			</div>	
+		</form>
+	</div>
 </div>
+
 
 
 <div id="spedizioni_section">

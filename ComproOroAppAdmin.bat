@@ -1,0 +1,2 @@
+ComproOroApp.hta "mod=administrator"
+

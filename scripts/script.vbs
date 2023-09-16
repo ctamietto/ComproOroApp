@@ -1,5 +1,5 @@
 	'rem versione 20230831_001
-		
+			
 	' testata spedizione
 	Class spedclass
     	Public kt,banco_metalli_id,banco_metalli_desc , data_ddt, numero_ddt
@@ -27,6 +27,10 @@
 	Class errorclass
 		Public cod,tipo,field,desc
 	End Class
+	
+	Class CLparameter
+		Public key,value
+	End Class
 
 	Public speddict: Set speddict = CreateObject("Scripting.Dictionary")
 	
@@ -39,10 +43,57 @@
 	Public todict: Set todict = CreateObject("Scripting.Dictionary")
 	
 	Public spederrorsdict: Set spederrorsdict = CreateObject("Scripting.Dictionary")
+	
+	Public bmerrorsdict: Set bmerrorsdict = CreateObject("Scripting.Dictionary")
+	
+	Public clparametersdict: Set clparametersdict = CreateObject("Scripting.Dictionary")
 
+	Function getCLParameter
+		If ( InStr(objGestSped.commandLine,"mod=administrator") > 0) Then
+			 Dim clpa : Set clpa = new CLparameter
+			 clpa.key = "usermod"
+			 clpa.value = "administrator"
+			 clparametersdict.Add clpa.key,clpa
+		Else 
+			 Dim clpb : Set clpb = new CLparameter
+			 clpb.key = "usermod"
+			 clpb.value = "base"
+			 clparametersdict.Add clpb.key,clpb
+		End If 
+	End Function
+
+	Function isAdministrator
+		Dim isa
+		isa = False 
+		If (clparametersdict.Exists("usermod")) Then 
+			Set clp = clparametersdict.Item("usermod")
+			If ( clp.value = "administrator" ) Then	
+				isa = True 
+			End If 
+		End If 
+		isAdministrator = isa
+	End Function
+	
 	Sub initialSizeAndPos
 		window.moveTo 30, 30
 	End Sub 
+
+	Function BMErrorsStatus
+		Dim ES
+		ES = False  
+		If Not IsNull(bmerrorsdict) And Not IsEmpty(bmerrorsdict) And bmerrorsdict.Count > 0 Then
+			ES = True 
+		End If 
+		BMErrorsStatus = ES
+	End Function
+
+	Sub BMErrorsAdd(errcl)
+		bmerrorsdict.Add errcl.field,errcl
+	End Sub 
+
+	Sub BMErrorsCleared
+		bmerrorsdict.RemoveAll()	
+	End Sub
 
 	Function SpedErrorsStatus
 		Dim ES
@@ -530,20 +581,38 @@
     End Sub
 	
 	Sub getStoreBM()
+	    Const ForReading = 1, ForWriting = 2, ForAppending = 8
+    	Const TristateUseDefault = -2, TristateTrue = -1, TristateFalse = 0	
+	
+		filename = "bm.mydb"
+		Set fso = CreateObject("Scripting.FileSystemObject")
+		fullPathToFilename = fso.GetAbsolutePathName(filename)
+		Rem alert(fullPathToFilename)
+		Rem If (fso.FileExists(filename)) Then
+		Rem	alert fullPathToFilename & " exists" 
+		Rem End If 
+		Rem restituisce un oggetto file stream 
+		Set fbm = fso.OpenTextFile(fullPathToFilename, ForReading, True, TristateFalse)
+
 		Dim bm: Set bm = New bmclass
-		With bm
-				.kt = "c07cb0bc-f3c7-461f-ae7f-93b1430912db"
-    			.desc = "Fonderia Pinco"
-			End With
-			bmdict.Add bm.kt, bm
+		
+		Do Until fbm.AtEndOfStream
+      		bmrecord = fbm.ReadLine
+      		Rem alert(bmrecord)      		
+      		abm=Split(bmrecord,"!#!")
+      		Rem alert(abm(0))
+      		Rem alert(abm(1))
 
 			Set bm = new bmclass
 			With bm
-				.kt = "a799419d-ae66-4174-986e-1da78274695a"
-    			.desc = "Fonderia Banco Metalli Vicenza"
+				.kt = abm(0)
+    			.desc = abm(1)
 			End With
 			bmdict.Add bm.kt, bm
 
+	    Loop
+	    fbm.Close
+	
     End Sub
 
 	Sub getStoreTO()
@@ -1305,8 +1374,25 @@
 		displayAllSpeds()
 	End Sub
 
+	Sub add_bm()
+		Dim bm: Set bm = new bmclass
+		BMErrorsCleared()
+		bm.kt = ""
+		bm.desc = ""
+		BMDisplay(bm)
+		show_mod_ins_bm()
+	End Sub
+
 	Sub modify_bm(kt)
-		MsgBox "Funzione modifica banco metalli non ancora implementata"
+		If bmdict.Exists(kt) Then
+			BMErrorsCleared()
+			Set bm = bmdict.Item(kt)
+			BMDisplay(bm)
+			show_mod_ins_bm()
+		Else 
+			MsgBox "Non esiste un banco metalli con chiave tecnica '" + kt + "'"
+		End If
+
 	End Sub
 
 	Sub modify_titolo(kt)
@@ -1531,3 +1617,153 @@
     	tableNode.appendChild(trNode)
 		
     End Sub
+
+	Sub show_bm_list() 
+    	document.getElementById("list_banco_metalli_container").style.display="block"
+    	document.getElementById("mod_add_banco_metalli_container").style.display="none"
+    End Sub
+	
+	Sub show_mod_ins_bm() 
+    	document.getElementById("list_banco_metalli_container").style.display="none"
+    	document.getElementById("mod_add_banco_metalli_container").style.display="block"
+    End Sub
+
+	Sub BMDetailCopy(ByRef bmDest,bmSrc)
+		bmDest.kt = bmSrc.kt		
+		bmDest.desc = bmSrc.desc
+    End Sub
+
+
+
+	Sub BMDetailValidate()
+  		Dim existErrors
+		existErrors = False 
+		BMErrorsCleared()
+			
+		Dim bm: Set bm = new bmclass
+		Dim isNewRecord
+		isNewRecord = False
+				
+		Call BMDetailGet(bm,isNewRecord)
+		BMDisplay(bm)
+    End Sub
+
+	Sub submit_bm
+  		Dim existErrors
+		existErrors = False 
+		BMErrorsCleared()
+
+		Dim bm: Set bm = new bmclass
+		Dim isNewRecord
+		isNewRecord = False
+		
+		Call BMDetailGet(bm,isNewRecord)
+		existErrors = BMErrorsStatus()
+		
+		If (Not existErrors) Then
+			If (Not isNewRecord) Then 
+				If bmdict.Exists(bm.kt) Then
+					Set bmDest = bmdict.Item(bm.kt)
+					Call BMDetailCopy(bmDest,bm)
+				Else 
+					MsgBox "Non esiste una banco metalli con chiave tecnica '" + kt + "'"
+				End If
+			Else
+				bm.kt = CreateGUID()
+ 				bmdict.Add bm.kt, bm
+			End If 
+		
+			BMStoreInFile()
+		
+			Dim bm_table: Set bm_table = document.getElementById( "bm_table" )
+			clean_table(bm_table)
+			displayAllBM()
+			show_bm_list()
+
+			Rem aggiorna la ragione sociale di tutti i ddt 
+			Dim spedizioni_table: Set spedizioni_table = document.getElementById( "spedizioni_table" )
+			clean_table(spedizioni_table)
+			displayAllSpeds()
+			
+		Else 
+			BMDisplay(bm)
+			MsgBox "ci sono errori"
+		End If 
+
+	End Sub
+	
+	
+	Sub BMDisplay(bm)
+		Set ktbm = document.getElementById( "ktbm" )
+		ktbm.value = bm.kt
+
+		Set bm_ragione_sociale = document.getElementById( "bm_ragione_sociale" )
+		bm_ragione_sociale.value = bm.desc
+		
+		Set bm_ragione_sociale_error_list = document.getElementsByName("bm_ragione_sociale_error") 
+ 		For Each Elem In bm_ragione_sociale_error_list
+ 			Dim bm_ragione_sociale_error_object: Set bm_ragione_sociale_error_object = New errorclass			
+ 			If bmerrorsdict.Exists("desc") Then
+				Set bm_ragione_sociale_error_object = bmerrorsdict.Item("desc")
+		  		Elem.innerHTML = bm_ragione_sociale_error_object.desc
+		  	Else 
+		  		Elem.innerHTML = ""
+			End if 
+ 		Next
+
+	End Sub 
+	
+	
+	Sub BMDetailGet(ByRef bm,ByRef isNewRecord)
+		BMErrorsCleared()
+		isNewRecord = False 
+		
+		Set kt = document.getElementById( "ktbm" )
+		If (IsNull(kt.value) Or IsEmpty(kt.value)) Then
+			bm.kt = ""
+		Else 
+			bm.kt = kt.value
+		End If		
+		
+		Set bm_ragione_sociale = document.getElementById( "bm_ragione_sociale" )
+
+		If (IsNull(bm_ragione_sociale.value) Or IsEmpty(bm_ragione_sociale.value)) Then
+			bm.desc = ""
+		Else 
+			bm.desc  = bm_ragione_sociale.value
+		End If		
+		
+		If (bm.desc = "") Then
+			Dim errclDesc: Set errclDesc = New errorclass
+			errclDesc.cod   = "000001"
+			errclDesc.tipo  = "REQUIRED"
+			errclDesc.field = "desc"
+			errclDesc.desc  = "IMPOSTARE RAGIONE SOCIALE"
+			BMErrorsAdd(errclDesc)
+		End If
+		
+		If (bm.kt = "") Then
+			isNewRecord = True
+		End If
+					
+    End Sub
+
+
+	Sub BMStoreInFile()
+		filename = "bm.mydb"
+	    Const ForReading = 1, ForWriting = 2, ForAppending = 8
+    	Const TristateUseDefault = -2, TristateTrue = -1, TristateFalse = 0
+    
+    	Dim fs, f
+    	Set fs = CreateObject("Scripting.FileSystemObject")
+    	Set f = fs.OpenTextFile(filename, ForWriting, True, TristateFalse)
+    	For Each i In bmdict.Keys
+    		Set bm = bmdict.Item(i)
+    		Rem componi la stringa che corrisponde al record  
+    		bmrecord = bm.kt & "!#!" & bm.desc
+	    	f.WriteLine bmrecord
+		Next 
+    	f.Close
+	End Sub
+	
+	
