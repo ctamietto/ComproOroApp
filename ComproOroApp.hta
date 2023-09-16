@@ -29,11 +29,7 @@ CONTEXTMENU="no"
 
 <script	 language="VBScript">
 	Sub Window_onLoad
-    	arrCommands = Split(objGestSped.commandLine, chr(34))    	
-    	MsgBox arrCommands
-    	Rem For i = 3 to (Ubound(arrCommands) – 1) Step 2
-        Rem 	MsgBox arrCommands(i)
-   	 	Rem Next
+		Rem non funziona , non viene richiamato allo startup
 	End Sub
 </script>
 
@@ -52,7 +48,8 @@ CONTEXTMENU="no"
 		window.resizeTo(1500,765);
 		initialSizeAndPos()
 		if (isAdministrator()) {
-			alert("sono amministratore")
+			// alert("sono amministratore")
+			document.getElementById("navbar_item_titoli").style.display= "block";
 		}
 		
 	}
@@ -107,7 +104,7 @@ CONTEXTMENU="no"
 	<div id="navbar_item_bm" class="navbar_item" onClick="select_tab('bm')" >
 			<h2>Banco Metalli</h2>
 	</div>
-	<div id="navbar_item_titoli" class="navbar_item" onClick="select_tab('titoli')" >
+	<div id="navbar_item_titoli" class="navbar_item" onClick="select_tab('titoli')" style="display:none" >
 			<h2>Titolo Oro</h2>
 	</div>
 	<div style="clear:both">
