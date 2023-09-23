@@ -46,6 +46,8 @@
 	
 	Public bmerrorsdict: Set bmerrorsdict = CreateObject("Scripting.Dictionary")
 	
+	Public toerrorsdict: Set toerrorsdict = CreateObject("Scripting.Dictionary")
+
 	Public clparametersdict: Set clparametersdict = CreateObject("Scripting.Dictionary")
 
 	Function getCLParameter
@@ -616,86 +618,32 @@
     End Sub
 
 	Sub getStoreTO()
+	    Const ForReading = 1, ForWriting = 2, ForAppending = 8
+    	Const TristateUseDefault = -2, TristateTrue = -1, TristateFalse = 0	
+
+		filename = "to.mydb"
+		Set fso = CreateObject("Scripting.FileSystemObject")
+		fullPathToFilename = fso.GetAbsolutePathName(filename)
+		Set fto = fso.OpenTextFile(fullPathToFilename, ForReading, True, TristateFalse)
+
 		Dim toi: Set toi = new toclass
-		With toi
-				.kt = "x07cb0bc-f3c7-461f-ae7f-93b1430912db"
-    			.desc = "999,9"
-    			.coefficiente = 0.999
-    			.coefficiente_titolo_stimato = 0.999
-			End With
-			todict.Add toi.kt, toi
+
+		Do Until fto.AtEndOfStream
+      		torecord = fto.ReadLine
+      		ato=Split(torecord,"!#!")
 
 			Set toi = new toclass
 			With toi
-				.kt = "y799419d-ae66-4174-986e-1da78274695a"
-    			.desc = "985"
-    			.coefficiente = 0.98
-    			.coefficiente_titolo_stimato = 0.998
+				.kt = ato(0)
+				tempdesc = Replace(ato(1),Chr(34),"")
+    			.desc = tempdesc
+    			.coefficiente =  CDbl(ato(2))
+    			.coefficiente_titolo_stimato = ato(3)
 			End With
 			todict.Add toi.kt, toi
 
-			Set toi = new toclass
-			With toi
-				.kt = "z71d8c09-2351-4c04-8087-c9d7c7876e12"
-    			.desc = "916"
-    			.coefficiente = 0.914
-    			.coefficiente_titolo_stimato = 0.998
-			End With
-			todict.Add toi.kt, toi
-
-			Set toi = new toclass
-			With toi
-				.kt = "y71d8c09-2351-4c04-8087-c9d7c7876e12"
-    			.desc = "900"
-    			.coefficiente = 0.894    			
-    			.coefficiente_titolo_stimato = 0.998
-			End With
-			todict.Add toi.kt, toi
-
-			Set toi = new toclass
-			With toi
-				.kt = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
-    			.desc = "750"
-    			.coefficiente = 0.738  			
-    			.coefficiente_titolo_stimato = 0.992
-			End With
-			todict.Add toi.kt, toi
-
-			Set toi = new toclass
-			With toi
-				.kt = "a71d8c09-2351-4c04-8087-c9d7c7876e12"				
-    			.desc = "585"
-    			.coefficiente = 0.55    			
-    			.coefficiente_titolo_stimato = 0.99
-			End With
-			todict.Add toi.kt, toi
-
-			Set toi = new toclass
-			With toi
-				.kt = "b71d8c09-2351-4c04-8087-c9d7c7876e12"
-    			.desc = "500"
-    			.coefficiente = 0.475
-    			.coefficiente_titolo_stimato = 0.99  			
-			End With
-			todict.Add toi.kt, toi
-
-			Set toi = new toclass
-			With toi
-				.kt = "c71d8c09-2351-4c04-8087-c9d7c7876e12"
-    			.desc = "375"
-    			.coefficiente = 0.35
-    			.coefficiente_titolo_stimato = 0.985
-			End With
-			todict.Add toi.kt, toi
-
-			Set toi = new toclass
-			With toi
-				.kt = "d71d8c09-2351-4c04-8087-c9d7c7876e12"
-    			.desc = "333"
-    			.coefficiente = 0.318    			
-    			.coefficiente_titolo_stimato = 0.985
-			End With
-			todict.Add toi.kt, toi
+	    Loop
+	    fto.Close
 
     End Sub
 
@@ -1395,10 +1343,6 @@
 
 	End Sub
 
-	Sub modify_titolo(kt)
-		MsgBox "Funzione modifica titolo non ancora implementata"
-	End Sub
-
 	Sub modify_sped(kt)
 		If speddict.Exists(kt) Then
 			SpedErrorsCleared()
@@ -1766,4 +1710,252 @@
     	f.Close
 	End Sub
 	
+	Sub show_to_list() 
+    	document.getElementById("list_titoli_container").style.display="block"
+    	document.getElementById("mod_add_titoli_container").style.display="none"
+    End Sub
+
+	Sub show_mod_ins_to() 
+    	document.getElementById("list_titoli_container").style.display="none"
+    	document.getElementById("mod_add_titoli_container").style.display="block"
+    End Sub
+    
+    Sub TODetailGet(toi,isNewRecord)
+		TOErrorsCleared()
+		isNewRecord = False 
+		
+		Set kt = document.getElementById( "ktto" )
+		If (IsNull(kt.value) Or IsEmpty(kt.value)) Then
+			toi.kt = ""
+		Else 
+			toi.kt = kt.value
+		End If		
+
+		Set to_desc = document.getElementById( "to_desc" )
+
+		If (IsNull(to_desc.value) Or IsEmpty(to_desc.value)) Then
+			toi.desc = ""
+		Else 
+			toi.desc  = to_desc.value
+		End If		
+		
+		If (toi.desc = "") Then
+			Dim errclDesc: Set errclDesc = New errorclass
+			errclDesc.cod   = "000001"
+			errclDesc.tipo  = "REQUIRED"
+			errclDesc.field = "desc"
+			errclDesc.desc  = "IMPOSTARE DESCRIZIONE"
+			TOErrorsAdd(errclDesc)
+		End If
+
+		Set coefficiente = document.getElementById( "coefficiente" )
+		
+		If (IsNull(coefficiente.value) Or IsEmpty(coefficiente.value) Or (Len(coefficiente.value) = 0 )) Then
+			toi.coefficiente = 0
+		Else 
+			toi.coefficiente  = CDbl(coefficiente.value)  
+		End If		
+
+		If (toi.coefficiente <= 0) Then
+			Dim errclC: Set errclC = New errorclass
+			errclC.cod   = "000002"
+			errclC.tipo  = "GREATER_THEN"
+			errclC.field = "coefficiente"
+			errclC.desc  = "IMPOSTARE COEFFICIENTE"
+			TOErrorsAdd(errclC)
+			anyErrors = True  
+		End If
+
+		Set coefficiente_titolo_stimato = document.getElementById( "coefficiente_titolo_stimato" )
+		
+		If (IsNull(coefficiente_titolo_stimato.value) Or IsEmpty(coefficiente_titolo_stimato.value) Or (Len(coefficiente_titolo_stimato.value) = 0 )) Then
+			toi.coefficiente_titolo_stimato = 0
+		Else 
+			toi.coefficiente_titolo_stimato  = CDbl(coefficiente_titolo_stimato.value)  
+		End If		
+
+		If (toi.coefficiente_titolo_stimato <= 0) Then
+			Dim errclCTS: Set errclCTS = New errorclass
+			errclCTS.cod   = "000003"
+			errclCTS.tipo  = "GREATER_THEN"
+			errclCTS.field = "coefficiente_titolo_stimato"
+			errclCTS.desc  = "IMPOSTARE COEFFICIENTE TITOLO STIMATO"
+			TOErrorsAdd(errclCTS)
+			anyErrors = True  
+		End If
+		
+		If (toi.kt = "") Then
+			isNewRecord = True
+		End If
+
+    End Sub 
+    
+    Sub TODetailCopy(toDest,toSrc)
+		toDest.kt = toSrc.kt		
+		toDest.desc = toSrc.desc
+		toDest.coefficiente = toSrc.coefficiente
+		toDest.coefficiente_titolo_stimato = toSrc.coefficiente_titolo_stimato
+    End Sub
+    
+    Sub TOStoreInFile
+		filename = "to.mydb"
+	    Const ForReading = 1, ForWriting = 2, ForAppending = 8
+    	Const TristateUseDefault = -2, TristateTrue = -1, TristateFalse = 0
+    
+    	Dim fs, f
+    	Set fs = CreateObject("Scripting.FileSystemObject")
+    	Set f = fs.OpenTextFile(filename, ForWriting, True, TristateFalse)
+    	For Each i In todict.Keys
+    		Set toi = todict.Item(i)
+    		Rem componi la stringa che corrisponde al record  
+    		torecord = toi.kt & "!#!" & Chr(34) & toi.desc & Chr(34) & "!#!" & CStr(toi.coefficiente) & "!#!" & CStr(toi.coefficiente_titolo_stimato)
+	    	f.WriteLine torecord
+		Next 
+    	f.Close
+    End Sub
+     
+    Sub submit_to
+  		Dim existErrors
+		existErrors = False 
+		TOErrorsCleared()
+
+		Dim toi: Set toi = new toclass
+		Dim isNewRecord
+		isNewRecord = False
+		
+		Call TODetailGet(toi,isNewRecord)
+		existErrors = TOErrorsStatus()
+				
+		If (Not existErrors) Then
+			If (Not isNewRecord) Then 
+				If todict.Exists(toi.kt) Then
+					Set toDest = todict.Item(toi.kt)
+					Call TODetailCopy(toDest,toi)
+				Else 
+					MsgBox "Non esiste un titolo con chiave tecnica '" + kt + "'"
+				End If
+			Else
+				toi.kt = CreateGUID()
+ 				todict.Add toi.kt, toi
+			End If 
+		
+			TOStoreInFile()
+		
+			Dim to_table: Set to_table = document.getElementById( "to_table" )
+			clean_table(to_table)
+			displayAllTO()
+			show_to_list()
+
+			Rem aggiorna il titolo di tutti i ddt 
+			Dim spedizioni_table: Set spedizioni_table = document.getElementById( "spedizioni_table" )
+			clean_table(spedizioni_table)
+			displayAllSpeds()
+			
+		Else 
+			TODisplay(toi)
+			MsgBox "ci sono errori"
+		End If 
+
+    End Sub 
+    
+    Sub TODetailValidate
+  		Dim existErrors
+		existErrors = False 
+		TOErrorsCleared()
+			
+		Dim toi: Set toi = new toclass
+		Dim isNewRecord
+		isNewRecord = False
+				
+		Call TODetailGet(toi,isNewRecord)
+		TODisplay(toi)
+    End Sub 
+    
+    Sub TOErrorsCleared
+		toerrorsdict.RemoveAll()	
+	End Sub
+
+	Sub TODisplay(toi)
+		Set ktto = document.getElementById( "ktto" )
+		ktto.value = toi.kt
+
+		Set to_desc = document.getElementById( "to_desc" )
+		to_desc.value = toi.desc
+		
+		
+		Set to_desc_error_list = document.getElementsByName("to_desc_error") 
+ 		For Each Elem In to_desc_error_list
+ 			Dim to_desc_error_list_object: Set to_desc_error_list_object = New errorclass			
+ 			If toerrorsdict.Exists("desc") Then
+				Set to_desc_error_list_object = toerrorsdict.Item("desc")
+		  		Elem.innerHTML = to_desc_error_list_object.desc
+		  	Else 
+		  		Elem.innerHTML = ""
+			End if 
+ 		Next
+
+		Set coefficiente = document.getElementById( "coefficiente" )
+		coefficiente.value = CStr(toi.coefficiente)
+		
+		Set coefficiente_error_list = document.getElementsByName("coefficiente_error") 
+ 		For Each Elem In coefficiente_error_list
+ 			Dim coefficiente_error_list_object: Set coefficiente_error_list_object = New errorclass			
+ 			If toerrorsdict.Exists("coefficiente") Then
+				Set coefficiente_error_list_object = toerrorsdict.Item("coefficiente")
+		  		Elem.innerHTML = coefficiente_error_list_object.desc
+		  	Else 
+		  		Elem.innerHTML = ""
+			End if 
+ 		Next
+
+		Set coefficiente_titolo_stimato = document.getElementById( "coefficiente_titolo_stimato" )
+		coefficiente_titolo_stimato.value = CStr(toi.coefficiente_titolo_stimato)
+
+		Set coefficiente_titolo_stimato_error_list = document.getElementsByName("coefficiente_titolo_stimato_error") 
+ 		For Each Elem In coefficiente_titolo_stimato_error_list
+ 			Dim coefficiente_titolo_stimato_error_list_object: Set coefficiente_titolo_stimato_error_list_object = New errorclass			
+ 			If toerrorsdict.Exists("coefficiente_titolo_stimato") Then
+				Set coefficiente_titolo_stimato_error_list_object = toerrorsdict.Item("coefficiente_titolo_stimato")
+		  		Elem.innerHTML = coefficiente_titolo_stimato_error_list_object.desc
+		  	Else 
+		  		Elem.innerHTML = ""
+			End if 
+ 		Next
+
+	End Sub
 	
+	Sub add_to()
+		Dim toi: Set toi = new toclass
+		TOErrorsCleared()
+		toi.kt = ""
+		toi.desc = ""
+		toi.coefficiente = 0
+		toi.coefficiente_titolo_stimato = 0
+		TODisplay(toi)
+		show_mod_ins_to()
+	End Sub
+
+	Sub modify_titolo(kt)
+		If todict.Exists(kt) Then
+			TOErrorsCleared()
+			Set toi = todict.Item(kt)
+			TODisplay(toi)
+			show_mod_ins_to()
+		Else 
+			MsgBox "Non esiste un titolo con chiave tecnica '" + kt + "'"
+		End If
+	End Sub
+
+	Function TOErrorsStatus
+		Dim ES
+		ES = False  
+		If Not IsNull(toerrorsdict) And Not IsEmpty(toerrorsdict) And toerrorsdict.Count > 0 Then
+			ES = True 
+		End If 
+		TOErrorsStatus = ES
+	End Function
+
+	Sub TOErrorsAdd(errcl)
+		toerrorsdict.Add errcl.field,errcl
+	End Sub 
+

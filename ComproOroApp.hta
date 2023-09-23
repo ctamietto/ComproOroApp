@@ -70,7 +70,7 @@ CONTEXTMENU="no"
 	}
 
 	function add_to_js() {
-		alert("funzione aggiunta titolo ancora da implementare")
+		add_to()
 	}
 	
 	function add_bm_js() {
@@ -126,6 +126,46 @@ CONTEXTMENU="no"
 			</tr>
 		</table>
 	</div>
+	<div id="mod_add_titoli_container"  style="display:none;margin:20px" >
+		<form id="ValidForm" onsubmit="submit_to(); return false;">
+			<input type="hidden" id="ktto" name="ktto" >
+			<fieldset style="margin-bottom:10px;border-radius: 5px;">
+				<legend>Dati Anagrafici:</legend>
+				<div>
+					<div class="field_div">
+						<label class="label_div" for="to_desc">Descrizione <br/>
+							<input id="to_desc" name="to_desc" TYPE="TEXT" SIZE="20" onkeypress="return isDecimalKey(event)" onchange="TODetailValidate()"  >
+							<div id="to_desc_error" name="to_desc_error" class="error_desc" ></div>
+						</label>
+					</div>
+				</div>
+				<div>
+					<div class="field_div">
+						<label class="label_div" for="to_desc">Coefficiente <br/>
+							<input id="coefficiente" name="coefficiente" TYPE="TEXT" SIZE="20" onkeypress="return isDecimalKey(event)" onchange="TODetailValidate()"  >
+							<div id="coefficiente_error" name="coefficiente_error" class="error_desc" ></div>
+						</label>
+					</div>
+				</div>
+				<div>
+				<div class="field_div">
+						<label class="label_div" for="to_desc">Coefficiente Titolo Stimato <br/>
+							<input id="coefficiente_titolo_stimato" name="coefficiente_titolo_stimato" TYPE="TEXT" SIZE="20" onkeypress="return isDecimalKey(event)" onchange="TODetailValidate()"  >
+							<div id="coefficiente_titolo_stimato_error" name="coefficiente_titolo_stimato_error" class="error_desc" ></div>
+						</label>
+					</div>
+				</div>
+			</fieldset>
+			<div style="float: right;">
+				<div>
+					<input name="Submit" type="submit" VALUE="Conferma">
+					<button name="back_to_list" type="button" onclick="show_to_list()">Annulla</button>
+				</div> 		
+			</div>		
+			<div style="clear:both;">
+			</div>	
+		</form>
+	</div>
 </div>
 
 <div id="banco_metalli_section"  style="display:none" >
@@ -145,7 +185,7 @@ CONTEXTMENU="no"
 		<form id="ValidForm" onsubmit="submit_bm(); return false;">
 			<input type="hidden" id="ktbm" name="ktbm" >
 			<fieldset style="margin-bottom:10px;border-radius: 5px;">
-				<legend>Dati Angrafici:</legend>
+				<legend>Dati Anagrafici:</legend>
 				<div>
 					<div class="field_div">
 						<label class="label_div" for="bm_ragione_sociale">Ragione Sociale <br/>
