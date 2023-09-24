@@ -3,7 +3,6 @@
 	' testata spedizione
 	Class spedclass
     	Public kt,banco_metalli_id,banco_metalli_desc , data_ddt, numero_ddt
-    	'Public titolo_oro_id, titolo_oro_desc
     	Public verga_stimata , titolo_stimato_verga , totale_grammi_rottami , totale_grammi_puro_stimato
     	Public verga_fonderia , titolo_fonderia , totale_grammi_puro_fonderia
     	Public titolo_lab_controsaggio , puro_stimato_lab_controsaggio
@@ -648,39 +647,33 @@
     End Sub
 
 	Sub getStoredSpedDetts()	
+		Const ForReading = 1, ForWriting = 2, ForAppending = 8
+    	Const TristateUseDefault = -2, TristateTrue = -1, TristateFalse = 0	
+
+		filename = "titoliddt.mydb"
+		Set fso = CreateObject("Scripting.FileSystemObject")
+		fullPathToFilename = fso.GetAbsolutePathName(filename)
+		Set ftd = fso.OpenTextFile(fullPathToFilename, ForReading, True, TristateFalse)
+
 		Dim speddet: Set speddet = new speddetclass
 
-		'titolo oro desc => 750
-		With speddet
-			.kt = "94da5c56-0c30-477a-bc24-ac603a30e3c7"
-			.fk = "edfc686e267e4a8daa434ee9577e81c8"
-    		.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
-    		.grammi_lordi = 3000
-    		.grammi_puro_stimati = 2214 
-		End With	
-		speddetdict.Add speddet.kt, speddet
-		
-		Set speddet = new speddetclass
-		'titolo oro desc => 750
-		With speddet
-			.kt = "cd1cdfa0-bafb-4362-b3ca-0efa035bee97"
-			.fk = "bf7431f2b63449569d067c5705d24a67"
-    		.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
-    		.grammi_lordi = 2950
-    		.grammi_puro_stimati = 2177.1 
-		End With	
-		speddetdict.Add speddet.kt, speddet
-		
-		Set speddet = new speddetclass
-		'titolo oro desc => 750
-		With speddet
-			.kt = "32cf79e5-a2c8-4e22-9273-6fd04cde5a2c"
-			.fk = "a067b56f757841cb93af2a0482eb4451"
-    		.titolo_oro_id = "w71d8c09-2351-4c04-8087-c9d7c7876e12"
-    		.grammi_lordi = 2999
-    		.grammi_puro_stimati = 2213.26
-		End With	
-		speddetdict.Add speddet.kt, speddet
+		Do Until ftd.AtEndOfStream
+      		tdrecord = ftd.ReadLine
+      		atd=Split(tdrecord,"!#!")
+
+			Set speddet = new speddetclass
+			With speddet
+				.kt = atd(0)
+				.fk = atd(1)
+				.titolo_oro_id = atd(2)
+	    		.grammi_lordi = CDbl(atd(3))
+    			.grammi_puro_stimati = CDbl(atd(4)) 		
+			End With
+			speddetdict.Add speddet.kt, speddet
+
+	    Loop
+	    ftd.Close
+
     End Sub
 
 	Rem rimuovi tutte le occorrenze del dettaglio di una spedizione ( legate ad una foreign key )
@@ -725,56 +718,51 @@
 	End Sub 
 	
 	Sub getStoredSpeds()
-			Dim sped: Set sped = new spedclass
-			Dim bm: Set bm = new bmclass
-			Dim toi: Set toi = new toclass
-			With sped
-				.kt = "edfc686e267e4a8daa434ee9577e81c8"
-    			.banco_metalli_id = "c07cb0bc-f3c7-461f-ae7f-93b1430912db"
-    			.data_ddt = "17/11/2022"
-    			.numero_ddt = 122
-				.totale_grammi_puro_stimato = 2214
-				.verga_stimata = 2976
-				.titolo_stimato_verga = 743.95   
-    			.totale_grammi_rottami = 3000
-    			.verga_fonderia = 2973.1
-    			.titolo_fonderia = 739
-    			.titolo_lab_controsaggio = 742
-			End With
+		Const ForReading = 1, ForWriting = 2, ForAppending = 8
+    	Const TristateUseDefault = -2, TristateTrue = -1, TristateFalse = 0	
 
-			speddict.Add sped.kt, sped
+		filename = "ddt.mydb"
+		Set fso = CreateObject("Scripting.FileSystemObject")
+		fullPathToFilename = fso.GetAbsolutePathName(filename)
+		Set fsp = fso.OpenTextFile(fullPathToFilename, ForReading, True, TristateFalse)
+
+		Dim sped: Set sped = new spedclass
+
+		Do Until fsp.AtEndOfStream
+      		sprecord = fsp.ReadLine
+      		asp=Split(sprecord,"!#!")
+
 			Set sped = new spedclass
 			With sped
-				.kt = "bf7431f2b63449569d067c5705d24a67"
-    			.banco_metalli_id = "a799419d-ae66-4174-986e-1da78274695a"
-    			.data_ddt = "24/11/2022"
-    			.numero_ddt = 123
-				.totale_grammi_puro_stimato = 2177.1
-				.verga_stimata = 2926.4
-				.titolo_stimato_verga = 743.95 
-    			.totale_grammi_rottami = 2950
-    			.verga_fonderia = 3008.9
-    			.titolo_fonderia = 742
-    			.titolo_lab_controsaggio = 743
+				.kt = asp(0)
+    			.banco_metalli_id = asp(1)
+    			.data_ddt = asp(2)
+    			.numero_ddt = asp(3)
+    			
+    			.totale_grammi_rottami = CDbl(asp(4))
+				.titolo_stimato_verga = CDbl(asp(5))
+				.verga_stimata = CDbl(asp(6))		
+				.totale_grammi_puro_stimato = CDbl(asp(7))
+    			
+    			.verga_fonderia = CDbl(asp(8))
+    			.titolo_fonderia = CDbl(asp(9))
+    			.totale_grammi_puro_fonderia = CDbl(asp(10))
+    			
+    			.titolo_lab_controsaggio = CDbl(asp(11))
+				.puro_stimato_lab_controsaggio = CDbl(asp(12)) 
+				
+				.differenza_grammi = CDbl(asp(13))
+				.differenza_percentuale = CDbl(asp(14))
+				
+				.differenza_grammi_con_saggio = CDbl(asp(15))
+				.differenza_percentuale_con_saggio = CDbl(asp(16))
+		
 			End With
-
 			speddict.Add sped.kt, sped
-			Set sped = new spedclass
-			With sped
-				.kt = "a067b56f757841cb93af2a0482eb4451"
-    			.banco_metalli_id = "c07cb0bc-f3c7-461f-ae7f-93b1430912db"
-    			.data_ddt = "02/12/2022"
-    			.numero_ddt = 124
-				.totale_grammi_puro_stimato = 2213.26
-				.verga_stimata = 2975.01
-				.titolo_stimato_verga = 743.95   
-    			.totale_grammi_rottami = 2999
-    			.verga_fonderia = 2965.9
-    			.titolo_fonderia = 740
-    			.titolo_lab_controsaggio = 743    			
-			End With
 
-			speddict.Add sped.kt, sped
+	    Loop
+	    fsp.Close
+
     End Sub
 
 
@@ -845,13 +833,6 @@
 			tdNodeBM.setAttributeNode(attrClassFieldBM)
     		trNode.appendChild(tdNodeBM)
     		
-    		'Set tdNodeTO = document.createElement("td")
-    		'tdNodeTO.innerHTML = "<p> " + CStr(sped.titolo_oro_desc) + " </p> "
-    		'Set attrClassFieldTO = document.createAttribute("class")
-			'attrClassFieldTO.value = "spedizioni_field"
-			'tdNodeTO.setAttributeNode(attrClassFieldTO)
-    		'trNode.appendChild(tdNodeTO)
-
     		Set tdNodeDDT = document.createElement("td")
     		tdNodeDDT.innerHTML = "<p> " + CStr(sped.numero_ddt) + " </p> "
     		Set attrClassFieldDDT = document.createAttribute("class")
@@ -865,21 +846,7 @@
 			attrClassFieldDataDDT.value = "spedizioni_field"
 			tdNodeDataDDT.setAttributeNode(attrClassFieldDataDDT)
     		trNode.appendChild(tdNodeDataDDT)
-    		    		
-    		'Set tdNodeGL = document.createElement("td")
-    		'tdNodeGL.innerHTML = "<p> " + CStr(sped.grammi_lordi) + " </p> "
-    		'Set attrClassFieldGL = document.createAttribute("class")
-			'attrClassFieldGL.value = "spedizioni_field"
-			'tdNodeGL.setAttributeNode(attrClassFieldGL)
-    		'trNode.appendChild(tdNodeGL)
-
-    		'Set tdNodeGPS = document.createElement("td")
-    		'tdNodeGPS.innerHTML = "<p> " + CStr(sped.grammi_puri_stimati) + " </p> "
-    		'Set attrClassFieldGPS = document.createAttribute("class")
-			'attrClassFieldGPS.value = "spedizioni_field"
-			'tdNodeGPS.setAttributeNode(attrClassFieldGPS)
-    		'trNode.appendChild(tdNodeGPS)
-    		
+    		    		    		
     		Set tdNodeTGR = document.createElement("td")
     		tdNodeTGR.innerHTML = "<p> " + CStr(sped.totale_grammi_rottami) + " </p> "
     		Set attrClassFieldTGR = document.createAttribute("class")
@@ -944,7 +911,7 @@
     		trNode.appendChild(tdNodeTGPLC)
     		
     		Set tdNodeDiffGR = document.createElement("td")
-    		tdNodeDiffGR.innerHTML = sped.differenza_grammi
+    		tdNodeDiffGR.innerHTML = CStr(sped.differenza_grammi)
     		Set attrStyleGR = document.createAttribute("style")
 			attrStyleGR.value = "background-color:#fb923c;color:white;font-weigth:bolder;text-align:center;"
 			tdNodeDiffGR.setAttributeNode(attrStyleGR)
@@ -958,7 +925,7 @@
     		trNode.appendChild(tdNodeDiffPERC)    		
 
     		Set tdNodeDiffGRCS = document.createElement("td")
-    		tdNodeDiffGRCS.innerHTML = sped.differenza_grammi_con_saggio
+    		tdNodeDiffGRCS.innerHTML = CStr(sped.differenza_grammi_con_saggio)
     		Set attrStyleGRCS = document.createAttribute("style")
 			attrStyleGRCS.value = "background-color:#fb923c;color:white;font-weigth:bolder;text-align:center;"
 			tdNodeDiffGRCS.setAttributeNode(attrStyleGRCS)
@@ -1135,6 +1102,7 @@
 		inputGL.setAttribute "id",titolo.kt
 		inputGL.setAttribute "type", "text"
 		inputGL.setAttribute "onchange" , "SpedDetailValidate()"
+		inputGL.setAttribute "onkeypress" , "return isDecimalKey(event)"
 		inputGL.value = 0
     	tdNodeGL.appendChild(inputGL)    		
     	Set attrClassFieldGL = document.createAttribute("class")
@@ -1157,8 +1125,8 @@
 		For Each i In currspeddetdict.Keys
     		Set csd = currspeddetdict.Item(i)
 			If (csd.titolo_oro_id = titolo.kt) Then
-				inputGL.value = csd.grammi_lordi
-				inputGPS.value = csd.grammi_puro_stimati
+				inputGL.value = CStr(csd.grammi_lordi)
+				inputGPS.value = CStr(csd.grammi_puro_stimati)
 			End If 
 		Next
 	
@@ -1168,7 +1136,7 @@
 	Sub displayAllSpeds()
 		For Each i In speddict.Keys
     		Set sped = speddict.Item(i)
-    		calcSped(sped)
+    		getBMdesc(sped)
     		displaySped(sped)
 		Next
     End Sub
@@ -1275,8 +1243,13 @@
 				Next 
 			End If 
 			
+			' inserisci i dettagli titoli del ddt
 			removeDettsOfSpedFK(sped.kt)
 			storeCurDettsOfSped()
+			
+			' registra i dai nel file system
+			SpedStoreInFile()
+			SpedDetailStoreInFile()
 
 			Dim spedizioni_table: Set spedizioni_table = document.getElementById( "spedizioni_table" )
 			clean_table(spedizioni_table)
@@ -1317,6 +1290,11 @@
 	Sub delete_sped(kt)
 		del_from_dict_sped(kt)
 		removeDettsOfSpedFK(kt)
+		
+		' registra i dai nel file system
+		SpedStoreInFile()
+		SpedDetailStoreInFile()
+		
 		Dim spedizioni_table: Set spedizioni_table = document.getElementById( "spedizioni_table" )
 		clean_table(spedizioni_table)
 		displayAllSpeds()
@@ -1959,3 +1937,49 @@
 		toerrorsdict.Add errcl.field,errcl
 	End Sub 
 
+	Sub getBMdesc(sped)
+		If bmdict.Exists(sped.banco_metalli_id) Then
+			Set bm = bmdict.Item(sped.banco_metalli_id)
+			sped.banco_metalli_desc = bm.desc
+		Else 
+			sped.banco_metalli_desc = ""
+		End If
+	End Sub
+	
+	
+	Sub SpedDetailStoreInFile
+		filename = "titoliddt.mydb"
+	    Const ForReading = 1, ForWriting = 2, ForAppending = 8
+    	Const TristateUseDefault = -2, TristateTrue = -1, TristateFalse = 0
+    
+    	Dim fs, f
+    	Set fs = CreateObject("Scripting.FileSystemObject")
+    	Set f = fs.OpenTextFile(filename, ForWriting, True, TristateFalse)
+    	For Each i In speddetdict.Keys
+    		Set speddet = speddetdict.Item(i)
+    		Rem componi la stringa che corrisponde al record  
+    		speddetrecord = speddet.kt & "!#!" & speddet.fk & "!#!" & speddet.titolo_oro_id & "!#!" & CStr(speddet.grammi_lordi) & "!#!" & CStr(speddet.grammi_puro_stimati)
+	    	f.WriteLine speddetrecord
+		Next 
+    	f.Close
+    End Sub
+    
+
+	Sub SpedStoreInFile
+		filename = "ddt.mydb"
+	    Const ForReading = 1, ForWriting = 2, ForAppending = 8
+    	Const TristateUseDefault = -2, TristateTrue = -1, TristateFalse = 0
+    
+    	Dim fs, f
+    	Set fs = CreateObject("Scripting.FileSystemObject")
+    	Set f = fs.OpenTextFile(filename, ForWriting, True, TristateFalse)
+    	For Each i In speddict.Keys
+    		Set sped = speddict.Item(i)
+    		Rem componi la stringa che corrisponde al record  
+    		spedrecord = sped.kt & "!#!" & sped.banco_metalli_id & "!#!" & sped.data_ddt & "!#!" & sped.numero_ddt & "!#!" & CStr(sped.totale_grammi_rottami) & "!#!" & CStr(sped.titolo_stimato_verga) & "!#!" & CStr(sped.verga_stimata) & "!#!" & CStr(sped.totale_grammi_puro_stimato) & "!#!" & CStr(sped.verga_fonderia) & "!#!" & CStr(sped.titolo_fonderia) & "!#!" & CStr(sped.totale_grammi_puro_fonderia) & "!#!" & CStr(sped.titolo_lab_controsaggio) & "!#!" & CStr(sped.puro_stimato_lab_controsaggio) & "!#!" & CStr(sped.differenza_grammi) & "!#!" & CStr(sped.differenza_percentuale) & "!#!" & CStr(sped.differenza_grammi_con_saggio) & "!#!" & CStr(sped.differenza_percentuale_con_saggio)
+	    	f.WriteLine spedrecord
+		Next 
+    	f.Close
+    End Sub
+    
+ 
