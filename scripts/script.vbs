@@ -319,7 +319,7 @@
 		If (IsNull(verga_fonderia.value) Or IsEmpty(verga_fonderia.value)) Then
 			sped.verga_fonderia = 0
 		Else 
-			sped.verga_fonderia  = CDbl(verga_fonderia.value)  
+			sped.verga_fonderia  = CDbl(Replace(verga_fonderia.value,".",","))
 		End If		
 
 		If (sped.verga_fonderia <= 0) Then
@@ -338,7 +338,7 @@
 		If (IsNull(titolo_fonderia.value) Or IsEmpty(titolo_fonderia.value)) Then
 			sped.titolo_fonderia = 0
 		Else 
-			sped.titolo_fonderia  = CDbl(titolo_fonderia.value)  
+			sped.titolo_fonderia  = CDbl(Replace(titolo_fonderia.value,".",","))
 		End If		
 
 		If (sped.titolo_fonderia <= 0) Then
@@ -359,7 +359,7 @@
 		If (IsNull(titolo_lab_controsaggio.value) Or IsEmpty(titolo_lab_controsaggio.value)) Then
 			sped.titolo_lab_controsaggio = 0
 		Else 
-			sped.titolo_lab_controsaggio  = CDbl(titolo_lab_controsaggio.value)  
+			sped.titolo_lab_controsaggio  = CDbl(Replace(titolo_lab_controsaggio.value,".",","))  
 		End If		
 
 		If (sped.titolo_lab_controsaggio <= 0) Then
@@ -913,14 +913,14 @@
     		Set tdNodeDiffGR = document.createElement("td")
     		tdNodeDiffGR.innerHTML = CStr(sped.differenza_grammi)
     		Set attrStyleGR = document.createAttribute("style")
-			attrStyleGR.value = "background-color:#fb923c;color:white;font-weigth:bolder;text-align:center;"
+			attrStyleGR.value = "background-color:#fcab69;color:white;font-weigth:bolder;text-align:center;"
 			tdNodeDiffGR.setAttributeNode(attrStyleGR)
     		trNode.appendChild(tdNodeDiffGR)    		
 
     		Set tdNodeDiffPERC = document.createElement("td")
     		tdNodeDiffPERC.innerHTML = CStr(sped.differenza_percentuale) + "%"
     		Set attrStylePERC = document.createAttribute("style")
-			attrStylePERC.value = "background-color:#fb923c;color:white;font-weigth:bolder;text-align:center;"
+			attrStylePERC.value = "background-color:#fcab69;color:white;font-weigth:bolder;text-align:center;"
 			tdNodeDiffPERC.setAttributeNode(attrStylePERC)
     		trNode.appendChild(tdNodeDiffPERC)    		
 
@@ -1042,7 +1042,7 @@
     		If (IsNull(glel.value) Or IsEmpty(glel.value) Or glel.value = "") Then
 				grammiLordo = 0
 			Else 
-				grammiLordo  = CDbl(glel.value)  
+				grammiLordo  = CDbl(Replace(glel.value,".",","))  
 			End If		
 
 			For Each j In currspeddetdict.Keys
@@ -1710,11 +1710,12 @@
 		End If		
 
 		Set to_desc = document.getElementById( "to_desc" )
+		
 
 		If (IsNull(to_desc.value) Or IsEmpty(to_desc.value)) Then
 			toi.desc = ""
 		Else 
-			toi.desc  = to_desc.value
+			toi.desc  = Replace(to_desc.value,".",",")
 		End If		
 		
 		If (toi.desc = "") Then
@@ -1726,12 +1727,13 @@
 			TOErrorsAdd(errclDesc)
 		End If
 
+
 		Set coefficiente = document.getElementById( "coefficiente" )
 		
 		If (IsNull(coefficiente.value) Or IsEmpty(coefficiente.value) Or (Len(coefficiente.value) = 0 )) Then
 			toi.coefficiente = 0
 		Else 
-			toi.coefficiente  = CDbl(coefficiente.value)  
+			toi.coefficiente  = CDbl(Replace(coefficiente.value,".",","))
 		End If		
 
 		If (toi.coefficiente <= 0) Then
@@ -1749,7 +1751,7 @@
 		If (IsNull(coefficiente_titolo_stimato.value) Or IsEmpty(coefficiente_titolo_stimato.value) Or (Len(coefficiente_titolo_stimato.value) = 0 )) Then
 			toi.coefficiente_titolo_stimato = 0
 		Else 
-			toi.coefficiente_titolo_stimato  = CDbl(coefficiente_titolo_stimato.value)  
+			toi.coefficiente_titolo_stimato  = CDbl(Replace(coefficiente_titolo_stimato.value,".",","))
 		End If		
 
 		If (toi.coefficiente_titolo_stimato <= 0) Then
@@ -1836,7 +1838,7 @@
 
     End Sub 
     
-    Sub TODetailValidate
+    Sub TODetailValidate(element,isDecimal)
   		Dim existErrors
 		existErrors = False 
 		TOErrorsCleared()

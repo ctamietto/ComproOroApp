@@ -63,7 +63,7 @@ CONTEXTMENU="no"
 	}
 	function isDecimalKey(evt) {
   		var charCode = (evt.which) ? evt.which : evt.keyCode
-  		if (charCode != 44) {
+  		if (charCode != 44 && charCode != 46) {
   			return isNumberKey(evt);
     	}
   		return true;
@@ -134,7 +134,7 @@ CONTEXTMENU="no"
 				<div>
 					<div class="field_div">
 						<label class="label_div" for="to_desc">Descrizione <br/>
-							<input id="to_desc" name="to_desc" TYPE="TEXT" SIZE="20" onkeypress="return isDecimalKey(event)" onchange="TODetailValidate()"  >
+							<input id="to_desc" name="to_desc" TYPE="TEXT" SIZE="20" onkeypress="return isDecimalKey(event)" onchange="TODetailValidate(this,true)"  >
 							<div id="to_desc_error" name="to_desc_error" class="error_desc" ></div>
 						</label>
 					</div>
@@ -142,7 +142,7 @@ CONTEXTMENU="no"
 				<div>
 					<div class="field_div">
 						<label class="label_div" for="to_desc">Coefficiente <br/>
-							<input id="coefficiente" name="coefficiente" TYPE="TEXT" SIZE="20" onkeypress="return isDecimalKey(event)" onchange="TODetailValidate()"  >
+							<input id="coefficiente" name="coefficiente" TYPE="TEXT" SIZE="20" onkeypress="return isDecimalKey(event)" onchange="TODetailValidate(this,true)"  >
 							<div id="coefficiente_error" name="coefficiente_error" class="error_desc" ></div>
 						</label>
 					</div>
@@ -150,7 +150,7 @@ CONTEXTMENU="no"
 				<div>
 				<div class="field_div">
 						<label class="label_div" for="to_desc">Coefficiente Titolo Stimato <br/>
-							<input id="coefficiente_titolo_stimato" name="coefficiente_titolo_stimato" TYPE="TEXT" SIZE="20" onkeypress="return isDecimalKey(event)" onchange="TODetailValidate()"  >
+							<input id="coefficiente_titolo_stimato" name="coefficiente_titolo_stimato" TYPE="TEXT" SIZE="20" onkeypress="return isDecimalKey(event)" onchange="TODetailValidate(this,true)"  >
 							<div id="coefficiente_titolo_stimato_error" name="coefficiente_titolo_stimato_error" class="error_desc" ></div>
 						</label>
 					</div>
@@ -218,7 +218,7 @@ CONTEXTMENU="no"
 			<th class="header_sped" colspan="4" >Dati Verga</th>
 			<th class="header_sped" colspan="3" >Dati Verga Fonderia</th>
 			<th class="header_sped" colspan="2" >Laboratorio Controsaggio</th>
-			<th class="header_sped" colspan="2" >Differenza</th>
+			<th class="header_sped" colspan="2" style="background-color:#a3988f;" >Differenza Stimato</th>
 			<th class="header_sped" colspan="2" >Differenza Laboratorio</th>
 			<th class="header_sped" colspan="2" >&nbsp;</th>
 		</tr>
@@ -275,10 +275,10 @@ CONTEXTMENU="no"
 				Tot. Gr. Puro
 			</th>
 									
-			<th class="header_sped" style="background-color:#fb923c;" >
+			<th class="header_sped" style="background-color:#fcab69;" >
 				Grammi 
 			</th>			
-			<th class="header_sped" style="background-color:#fb923c;" >
+			<th class="header_sped" style="background-color:#fcab69;" >
 				Percentuale
 			</th>			
 
@@ -420,12 +420,12 @@ CONTEXTMENU="no"
 						<legend>Dati Differenza tra Puro Stimato / Puro Fonderia :</legend>
 						<div class="field_div" >
 							<label class="label_div" for="">Differenza Grammi <br/>
-								<p id="differenza_grammi" name="differenza_grammi" style="padding:0px;background-color:#fb923c;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
+								<p id="differenza_grammi" name="differenza_grammi" style="padding:0px;background-color:#fcab69;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
 							</label>
 						</div>
 						<div class="field_div" >
 							<label class="label_div" for="">Differenza Percentuale <br/>
-								<p id="differenza_percentuale" name="differenza_percentuale" style="padding:0px;background-color:#fb923c;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
+								<p id="differenza_percentuale" name="differenza_percentuale" style="padding:0px;background-color:#fcab69;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
 							</label>
 						</div>
 					</fieldset>
