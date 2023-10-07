@@ -51,7 +51,7 @@ CONTEXTMENU="no"
 			// alert("sono amministratore")
 			document.getElementById("navbar_item_titoli").style.display= "block";
 		}
-		
+		BuildMultiSelectBM()
 	}
 	
 	function isNumberKey(evt) {
@@ -212,6 +212,29 @@ CONTEXTMENU="no"
 <div id="spedizioni_section">
 
 	<div id="list_speds_container" >
+
+		<div id="search_speds_container" >
+			<form id="SearchForm" onsubmit="submit_search(); return false;">
+				<fieldset style="margin-bottom:10px;border-radius: 5px;">
+					<legend>Ricerca:</legend>
+					<div>
+						<div class="field_div">
+							<label class="label_div" for="search_bm">Banco Metalli <br/>
+								<select id="search_bm" name="search_bm" multiple size="3"  ></select>
+							</label>
+						</div>
+					</div>
+					<div style="float: right;">
+						<div>
+							<input name="Submit" type="submit" VALUE="Effettua Ricerca">
+							<button name="clear" type="button" onclick="FiltersDisplayCleared()">Elimina Filtri</button>
+						</div> 		
+					</div>		
+					<div style="clear:both;">
+				</fieldset>
+			</form>
+		</div>
+		
 	<table cellspacing="0" cellpadding="0" id="spedizioni_table" >
 		<tr class="header_tr" >
 			<th class="header_sped" colspan="3" >Dati DDT</th>

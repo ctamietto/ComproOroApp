@@ -30,6 +30,10 @@
 	Class CLparameter
 		Public key,value
 	End Class
+	
+	Class filterclass
+		Public field,value
+	End Class
 
 	Public speddict: Set speddict = CreateObject("Scripting.Dictionary")
 	
@@ -49,9 +53,11 @@
 
 	Public clparametersdict: Set clparametersdict = CreateObject("Scripting.Dictionary")
 
+	Public filtersdict: Set filtersdict = CreateObject("Scripting.Dictionary")
+
 	Function getCLParameter
 		If ( InStr(objGestSped.commandLine,"mod=administrator") > 0) Then
-			 Dim clpa : Set clpa = new CLparameter
+			 Dim clpa : Set clpa = New CLparameter
 			 clpa.key = "usermod"
 			 clpa.value = "administrator"
 			 clparametersdict.Add clpa.key,clpa
@@ -1137,7 +1143,11 @@
 		For Each i In speddict.Keys
     		Set sped = speddict.Item(i)
     		getBMdesc(sped)
-    		displaySped(sped)
+    		If (SpedRowFiltered(sped)) Then
+    			'riga non visualizzata in quanto rispecchia i criteri del filtro
+    		Else 
+    			displaySped(sped)
+    		End If 
 		Next
     End Sub
 	
@@ -1607,6 +1617,9 @@
 			clean_table(spedizioni_table)
 			displayAllSpeds()
 			
+			'ricostruisci la select multi del filtro banco metalli
+			BuildMultiSelectBM()
+			RebuildFilterMultiSelectBM()
 		Else 
 			BMDisplay(bm)
 			MsgBox "ci sono errori"
@@ -1830,7 +1843,7 @@
 			Dim spedizioni_table: Set spedizioni_table = document.getElementById( "spedizioni_table" )
 			clean_table(spedizioni_table)
 			displayAllSpeds()
-			
+						
 		Else 
 			TODisplay(toi)
 			MsgBox "ci sono errori"
@@ -1984,4 +1997,102 @@
     	f.Close
     End Sub
     
- 
+ 	Sub submit_search
+ 		Dim filteritem : Set filteritem = New filterclass
+		filteritem.field = "search_bm"
+		filteritem.value = "" 
+ 		filterfound = False 
+ 	
+ 	    Dim search_bm: Set search_bm = document.getElementById("search_bm")
+ 	    For Each optioni In search_bm.options.all
+ 	    	If Not IsNull(optioni.value) And Not IsEmpty(optioni.value) And Len(optioni.value) > 0 Then
+ 	    		If Not IsNull(optioni.selected) And Not IsEmpty(optioni.selected) And optioni.selected Then
+					filteritem.value = filteritem.value + optioni.value
+					filterfound = True
+ 	    		End If 
+ 	    	End If 
+ 	    Next
+ 	    If filterfound Then
+ 	    	If filtersdict.Exists(filteritem.field) Then 
+				filtersdict.Remove(filteritem.field) 
+ 	    	End If 
+ 	    	filtersdict.Add filteritem.field,filteritem
+ 	    Else 
+ 	    	'ripulisci eventuali filtri di search_bm derivanti da precedenti ricerche
+ 	    	filtersdict.Remove("search_bm")
+ 	    End If
+		
+		Dim spedizioni_table: Set spedizioni_table = document.getElementById( "spedizioni_table" )
+		clean_table(spedizioni_table)
+		displayAllSpeds()
+ 	End Sub
+ 	
+ 	Sub BuildMultiSelectBM
+ 	    	Dim search_bm: Set search_bm = document.getElementById("search_bm")
+    		BuildSelectBM(search_bm)
+    End Sub
+        
+	Function FiltersStatus
+		Dim ES
+		ES = False  
+		If Not IsNull(filtersdict) And Not IsEmpty(filtersdict) And filtersdict.Count > 0 Then
+			ES = True 
+		End If 
+		FiltersStatus = ES
+	End Function
+	
+	Sub FilterAdd(filteri)
+		filtersdict.Add filteri.field,filteri
+	End Sub 
+
+    Sub FiltersCleared
+		filtersdict.RemoveAll()	
+	End Sub
+		
+	Sub FiltersDisplayCleared
+		For Each filteri In filtersdict
+			If (filteri = "search_bm") Then
+ 		    	Dim search_bm: Set search_bm = document.getElementById("search_bm")
+	    		BuildSelectBM(search_bm)		 
+			End If 
+		Next
+		filtersdict.RemoveAll()	
+
+		Dim spedizioni_table: Set spedizioni_table = document.getElementById( "spedizioni_table" )
+		clean_table(spedizioni_table)
+		displayAllSpeds()
+	End Sub
+		
+	Function SpedRowFiltered(sped)
+		Dim srf
+		srf = False 
+		If FiltersStatus() Then
+			For Each filteri In filtersdict
+				If (filteri = "search_bm") Then
+					Set filtero = filtersdict.Item(filteri)
+					If InStr(filtero.value,sped.banco_metalli_id) = 0 Then
+						srf = True  
+					End If 
+				End If 
+			Next
+		End If 
+		SpedRowFiltered = srf
+	End Function
+
+	Sub RebuildFilterMultiSelectBM
+		Dim search_bm: Set search_bm = document.getElementById("search_bm")
+		If FiltersStatus() Then
+			For Each filteri In filtersdict
+				If (filteri = "search_bm") Then
+					Set filtero = filtersdict.Item(filteri)
+					For Each optioni In search_bm.options.all
+ 	    				If Not IsNull(optioni.value) And Not IsEmpty(optioni.value) And Len(optioni.value) > 0 Then
+ 	    					If (filtero.value = optioni.value) Then
+ 	    						 optioni.selected = True 
+ 	    					End If 
+ 	    				End If 
+					Next
+				End If 
+			Next 		
+		End If 
+	End Sub 
