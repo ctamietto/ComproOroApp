@@ -45,7 +45,7 @@ CONTEXTMENU="no"
 		displayAllSpeds()
 		displayAllBM()
 		displayAllTO()
-		window.resizeTo(1500,765);
+		window.resizeTo(1500,900);
 		initialSizeAndPos()
 		if (isAdministrator()) {
 			// alert("sono amministratore")
@@ -96,6 +96,10 @@ CONTEXTMENU="no"
 <body bgcolor="white" onLoad='DoStartup();' >
 
 <!--{{InsertControlsHere}} - Do not remove this line-->
+
+<div id="banner" name="banner" style="min-width:100%;">
+	<img src="images/banner.png" alt="Banner" style="max-width:100%;">
+</div>
 
 <div id="navbar" name="navbar" >
 	<div id="navbar_item_sped" class="navbar_item navbar_item_selected" onClick="select_tab('speds')" >
@@ -306,10 +310,10 @@ CONTEXTMENU="no"
 			</th>			
 
 
-			<th class="header_sped" style="background-color:#fb923c;" >
+			<th class="header_sped" style="background-color:#fcb276;" >
 				Grammi 
 			</th>			
-			<th class="header_sped" style="background-color:#fb923c;" >
+			<th class="header_sped" style="background-color:#fcb276;" >
 				Percentuale
 			</th>			
 
@@ -456,12 +460,12 @@ CONTEXTMENU="no"
 						<legend>Dati Differenza  tra Puro Fonderia / Puro Laboratorio :</legend>
 						<div class="field_div" >
 							<label class="label_div" for="">Differenza Grammi <br/>
-								<p id="differenza_grammi_con_saggio" name="differenza_grammi_con_saggio" style="padding:0px;background-color:#fb923c;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
+								<p id="differenza_grammi_con_saggio" name="differenza_grammi_con_saggio" style="padding:0px;background-color:#fcb276;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
 							</label>
 						</div>
 						<div class="field_div" >
 							<label class="label_div" for="">Differenza Percentuale <br/>
-								<p id="differenza_percentuale_con_saggio" name="differenza_percentuale_con_saggio" style="padding:0px;background-color:#fb923c;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
+								<p id="differenza_percentuale_con_saggio" name="differenza_percentuale_con_saggio" style="padding:0px;background-color:#fcb276;text-align:center;margin:0px;border: 2px solid #7A6D63;border-radius: 5px;color:white;font-weigth:bolder;font-size:20px" >0</p>
 							</label>
 						</div>
 					</fieldset>

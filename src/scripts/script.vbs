@@ -933,14 +933,14 @@
     		Set tdNodeDiffGRCS = document.createElement("td")
     		tdNodeDiffGRCS.innerHTML = CStr(sped.differenza_grammi_con_saggio)
     		Set attrStyleGRCS = document.createAttribute("style")
-			attrStyleGRCS.value = "background-color:#fb923c;color:white;font-weigth:bolder;text-align:center;"
+			attrStyleGRCS.value = "background-color:#fcb276;color:white;font-weigth:bolder;text-align:center;"
 			tdNodeDiffGRCS.setAttributeNode(attrStyleGRCS)
     		trNode.appendChild(tdNodeDiffGRCS)    		
 
     		Set tdNodeDiffPERCCS = document.createElement("td")
     		tdNodeDiffPERCCS.innerHTML = CStr(sped.differenza_percentuale_con_saggio) + "%"
     		Set attrStylePERCCS = document.createAttribute("style")
-			attrStylePERCCS.value = "background-color:#fb923c;color:white;font-weigth:bolder;text-align:center;"
+			attrStylePERCCS.value = "background-color:#fcb276;color:white;font-weigth:bolder;text-align:center;"
 			tdNodeDiffPERCCS.setAttributeNode(attrStylePERCCS)
     		trNode.appendChild(tdNodeDiffPERCCS)    		
 
@@ -2050,17 +2050,23 @@
 	End Sub
 		
 	Sub FiltersDisplayCleared
-		For Each filteri In filtersdict
-			If (filteri = "search_bm") Then
- 		    	Dim search_bm: Set search_bm = document.getElementById("search_bm")
-	    		BuildSelectBM(search_bm)		 
-			End If 
-		Next
-		filtersdict.RemoveAll()	
-
+		If (FiltersStatus) Then
+			For Each filteri In filtersdict
+				If (filteri = "search_bm") Then
+ 		    		Dim search_bm: Set search_bm = document.getElementById("search_bm")
+	    			BuildSelectBM(search_bm)		 
+				End If 
+			Next
+			filtersdict.RemoveAll()
+		Else 	
+ 		    Dim search_bm_2: Set search_bm_2 = document.getElementById("search_bm")
+	    	BuildSelectBM(search_bm_2)		 
+		End If
+		
 		Dim spedizioni_table: Set spedizioni_table = document.getElementById( "spedizioni_table" )
 		clean_table(spedizioni_table)
 		displayAllSpeds()
+		
 	End Sub
 		
 	Function SpedRowFiltered(sped)
