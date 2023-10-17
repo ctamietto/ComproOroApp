@@ -81,6 +81,15 @@
 		isAdministrator = isa
 	End Function
 	
+	Function getLogicalDiskLetter
+		getLogicalDiskLetter = Right(Left(objGestSped.commandLine,3),2)
+	End Function 
+	
+	Function calcUniqueIdentifierForHash
+		uifh = ""
+		calcUniqueIdentifierForHash = uifh
+	End Function
+	
 	Sub initialSizeAndPos
 		window.moveTo 30, 30
 	End Sub 
