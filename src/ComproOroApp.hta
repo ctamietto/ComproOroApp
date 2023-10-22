@@ -50,8 +50,19 @@ CONTEXTMENU="no"
 		if (isAdministrator()) {
 			// alert("sono amministratore")
 			document.getElementById("navbar_item_titoli").style.display= "block";
+			document.getElementById("navbar_item_admin").style.display= "block";
 		}
-		//alert(getLogicalDiskLetter())
+		//var ldl = getLogicalDiskLetter();
+		//alert(ldl);
+		//var uifh = calcUniqueIdentifierForHash(ldl);
+		//alert(uifh);
+		//var hash = sha1HashString(uifh);
+		//alert(hash);
+		//generateHashFile();
+		if (!checkHashFile()) {
+			alert("Supporto non autorizzato");
+			window.close()
+		}
 		BuildMultiSelectBM()
 	}
 	
@@ -112,7 +123,23 @@ CONTEXTMENU="no"
 	<div id="navbar_item_titoli" class="navbar_item" onClick="select_tab('titoli')" style="display:none" >
 			<h2>Titolo Oro</h2>
 	</div>
+	<div id="navbar_item_admin" class="navbar_item" onClick="select_tab('admin')" style="display:none" >
+			<h2>Amministrazione</h2>
+	</div>
 	<div style="clear:both">
+	</div>
+</div>
+
+<div id="admin_section" style="display:none" >
+	<div id="admin_container"  style="margin:20px" >
+		<form id="ValidFormAdmin" onsubmit="submit_admin(); return false;">
+			<fieldset style="margin-bottom:10px;border-radius: 5px;">
+				<legend>Generazione Chiave di Controllo</legend>
+				<div>
+					<input name="Submit" type="submit" VALUE="Conferma Generazione">
+				</div>
+			</fieldset>
+		</form>
 	</div>
 </div>
 

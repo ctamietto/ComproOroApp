@@ -85,9 +85,83 @@
 		getLogicalDiskLetter = Right(Left(objGestSped.commandLine,3),2)
 	End Function 
 	
-	Function calcUniqueIdentifierForHash
+	Function calcUniqueIdentifierForHash(driveLetter)
 		uifh = ""
+		
+		strComputer = "." 
+		Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\CIMV2") 
+		Set colItems = objWMIService.ExecQuery( _
+    		"SELECT * FROM Win32_DiskDrive",,48) 
+		For Each objItem in colItems 
+		   	query = "ASSOCIATORS OF {Win32_DiskDrive.DeviceID='" + objItem.DeviceID + "'} WHERE AssocClass = Win32_DiskDriveToDiskPartition" ' link the physical drives to the partitions
+   			Set partitions = objWMIService.ExecQuery(query) 
+   			For Each partition In partitions 
+      			query = "ASSOCIATORS OF {Win32_DiskPartition.DeviceID='" + partition.DeviceID + "'} WHERE AssocClass = Win32_LogicalDiskToPartition"  ' link the partitions to the logical disks 
+      			Set logicalDisks = objWMIService.ExecQuery (query) 
+      			For Each logicalDisk In logicalDisks      
+         			' WScript.Echo logicalDisk.DeviceID & " --- " & partition.Caption & " --- " & objItem.SerialNumber
+         			If (logicalDisk.DeviceID = driveLetter ) Then
+         				uifh = objItem.SerialNumber
+         			End If 
+      			Next
+    		Next 
+		Next
+		
 		calcUniqueIdentifierForHash = uifh
+	End Function
+	
+	function sha1HashString(str)
+    	Dim hexStr, x, aBytes, sha1
+    	aBytes = CreateObject("System.Text.UTF8Encoding").GetBytes_4(str)
+    	Set sha1 = CreateObject("System.Security.Cryptography.SHA1Managed")
+    	sha1.Initialize()
+    	aBytes = sha1.ComputeHash_2( (aBytes) )
+    	For x=1 to lenb(aBytes)
+        	hexStr= hex(ascb(midb( (aBytes),x,1)))
+        	If len(hexStr)=1 then hexStr="0" & hexStr
+        	sha1HashString=sha1HashString & hexStr
+    	Next
+	End Function
+	
+	Sub generateHashFile()
+		filename = "hashkey.txt"
+	    Const ForReading = 1, ForWriting = 2, ForAppending = 8
+    	Const TristateUseDefault = -2, TristateTrue = -1, TristateFalse = 0
+
+		ldl = getLogicalDiskLetter()
+		uifh = calcUniqueIdentifierForHash(ldl)
+		hash = sha1HashString(uifh)
+    
+    	Dim fs, f
+    	Set fs = CreateObject("Scripting.FileSystemObject")
+    	Set f = fs.OpenTextFile(filename, ForWriting, True, TristateFalse)
+    	f.WriteLine hash
+    	f.Close
+	End Sub
+	
+	Function checkHashFile()
+		filename = "hashkey.txt"
+		checkHashFile = True
+	    Const ForReading = 1, ForWriting = 2, ForAppending = 8
+    	Const TristateUseDefault = -2, TristateTrue = -1, TristateFalse = 0
+
+		Set fs = CreateObject("Scripting.FileSystemObject")
+		If fs.FileExists(filename) Then
+ 	    	Set f = fs.OpenTextFile(filename, ForReading, True, TristateFalse)
+	    	fileHash = f.ReadLine
+		   	f.Close
+		   	'alert(fileHash)
+			ldl = getLogicalDiskLetter()
+			uifh = calcUniqueIdentifierForHash(ldl)
+			hash = sha1HashString(uifh)
+			'alert(hash)
+			If (fileHash <> hash) Then
+				checkHashFile = false
+			End If
+		Else
+		    'Wscript.Echo "File does not exist."
+		End If
+		'alert(checkHashFile)
 	End Function
 	
 	Sub initialSizeAndPos
@@ -1387,6 +1461,16 @@
 		attrStyleTitoli.value = "display:none;"
 		titoli.setAttributeNode(attrStyleTitoli)
 
+	    Dim navbar_item_admin: Set navbar_item_admin = document.getElementById( "navbar_item_admin" )
+	    Dim admin: Set admin = document.getElementById( "admin_section" )
+
+	    Set attrClassAdmin = document.createAttribute("class")
+		attrClassAdmin.value = "navbar_item"
+		navbar_item_admin.setAttributeNode(attrClassAdmin)
+
+	    Set attrStyleAdmin = document.createAttribute("style")
+		attrStyleAdmin.value = "display:none;"
+		admin.setAttributeNode(attrStyleAdmin)
 	End Sub
 
 	Sub select_tab_bm()
@@ -1422,6 +1506,17 @@
 	    Set attrStyleTitoli = document.createAttribute("style")
 		attrStyleTitoli.value = "display:none;"
 		titoli.setAttributeNode(attrStyleTitoli)
+
+	    Dim navbar_item_admin: Set navbar_item_admin = document.getElementById( "navbar_item_admin" )
+	    Dim admin: Set admin = document.getElementById( "admin_section" )
+
+	    Set attrClassAdmin = document.createAttribute("class")
+		attrClassAdmin.value = "navbar_item"
+		navbar_item_admin.setAttributeNode(attrClassAdmin)
+
+	    Set attrStyleAdmin = document.createAttribute("style")
+		attrStyleAdmin.value = "display:none;"
+		admin.setAttributeNode(attrStyleAdmin)
 	End Sub
 
 	Sub select_tab_titoli()
@@ -1457,6 +1552,63 @@
 	    Set attrStyleTitoli = document.createAttribute("style")
 		attrStyleTitoli.value = "display:block;"
 		titoli.setAttributeNode(attrStyleTitoli)
+
+	    Dim navbar_item_admin: Set navbar_item_admin = document.getElementById( "navbar_item_admin" )
+	    Dim admin: Set admin = document.getElementById( "admin_section" )
+
+	    Set attrClassAdmin = document.createAttribute("class")
+		attrClassAdmin.value = "navbar_item"
+		navbar_item_admin.setAttributeNode(attrClassAdmin)
+
+	    Set attrStyleAdmin = document.createAttribute("style")
+		attrStyleAdmin.value = "display:none;"
+		admin.setAttributeNode(attrStyleAdmin)
+	End Sub
+
+	Sub select_tab_admin()
+	    Dim navbar_item_sped: Set navbar_item_sped = document.getElementById( "navbar_item_sped" )
+	    Dim spedizioni: Set spedizioni = document.getElementById( "spedizioni_section" )
+
+	    Set attrClassSped = document.createAttribute("class")
+		attrClassSped.value = "navbar_item"
+		navbar_item_sped.setAttributeNode(attrClassSped)
+
+	    Set attrStyleSped = document.createAttribute("style")
+		attrStyleSped.value = "display:none;"
+		spedizioni.setAttributeNode(attrStyleSped)
+
+	    Dim navbar_item_bm: Set navbar_item_bm = document.getElementById( "navbar_item_bm" )
+	    Dim banco_metalli: Set banco_metalli = document.getElementById( "banco_metalli_section" )
+
+	    Set attrClassBM = document.createAttribute("class")
+		attrClassBM.value = "navbar_item"
+		navbar_item_bm.setAttributeNode(attrClassBM)
+
+	    Set attrStyleBM = document.createAttribute("style")
+		attrStyleBM.value = "display:none;"
+		banco_metalli.setAttributeNode(attrStyleBM)
+		
+	    Dim navbar_item_titoli: Set navbar_item_titoli = document.getElementById( "navbar_item_titoli" )
+	    Dim titoli: Set titoli = document.getElementById( "titoli_section" )
+
+	    Set attrClassTitoli = document.createAttribute("class")
+		attrClassTitoli.value = "navbar_item"
+		navbar_item_titoli.setAttributeNode(attrClassTitoli)
+
+	    Set attrStyleTitoli = document.createAttribute("style")
+		attrStyleTitoli.value = "display:none;"
+		titoli.setAttributeNode(attrStyleTitoli)
+
+	    Dim navbar_item_admin: Set navbar_item_admin = document.getElementById( "navbar_item_admin" )
+	    Dim admin: Set admin = document.getElementById( "admin_section" )
+
+	    Set attrClassAdmin = document.createAttribute("class")
+		attrClassAdmin.value = "navbar_item navbar_item_selected"
+		navbar_item_admin.setAttributeNode(attrClassAdmin)
+
+	    Set attrStyleAdmin = document.createAttribute("style")
+		attrStyleAdmin.value = "display:block;"
+		admin.setAttributeNode(attrStyleAdmin)	
 	End Sub
 
 	Sub select_tab(tab)
@@ -1464,11 +1616,11 @@
 			case "speds"
 				select_tab_speds()
 			Case "bm" 
-				select_tab_bm()
-				
+				select_tab_bm()				
 			Case "titoli"
 				select_tab_titoli()
-			
+			Case "admin"
+				select_tab_admin()
 		End Select
 	End Sub
  
@@ -2111,3 +2263,10 @@
 			Next 		
 		End If 
 	End Sub 
+	
+	Sub submit_admin
+		generateHashFile()
+		alert("Operazione terminata, verificare che il file hashkey.txt sia stato generato correttamente")
+	End Sub
+	
+	
