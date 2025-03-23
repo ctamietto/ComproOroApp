@@ -323,13 +323,97 @@
 		End If
 		
 		If (sped.data_ddt <> "") Then 
-			Set objRE = New RegExp
+			
+			Rem hanno introdotto 8 numeri senza separatori
+			Set objRE1C = New RegExp
+			
+			With objRE1C
+				.Pattern    = "^(\d{8})$"
+				.IgnoreCase = True
+				.Global     = False
+			End With
+			
+			data_ddt_matched = False
+			
+			If objRE1C.Test( sped.data_ddt ) Then
+				tmp_data_ddt = ""
+				For i = 1 To Len(sped.data_ddt)
+    				tmp_char = Mid(sped.data_ddt, i, 1)
+    				If (i = 3) Then
+    					tmp_data_ddt = tmp_data_ddt + "/"
+    				End If
+    				If (i = 5) Then
+    					tmp_data_ddt = tmp_data_ddt + "/"
+    				End If
+    				tmp_data_ddt = tmp_data_ddt + tmp_char
+  				Next
+  				sped.data_ddt = tmp_data_ddt
+  				data_ddt_matched = True 				
+			End If			
+			
+			If (Not (data_ddt_matched) ) Then
+				Set objRE2C = New RegExp
+				
+				With objRE2C
+					.Pattern    = "^(\d{7})$"
+					.IgnoreCase = True
+					.Global     = False
+				End With
 
+				If objRE2C.Test( sped.data_ddt ) Then
+					tmp_data_ddt_7 = ""
+					For i = 1 To Len(sped.data_ddt)
+    					tmp_char_7 = Mid(sped.data_ddt, i, 1)
+    					If (i = 2) Then
+    						tmp_data_ddt_7 = tmp_data_ddt_7 + "/"
+    					End If
+    					If (i = 4) Then
+    						tmp_data_ddt_7 = tmp_data_ddt_7 + "/"
+    					End If
+    					tmp_data_ddt_7 = tmp_data_ddt_7 + tmp_char_7
+  					Next
+  					sped.data_ddt = tmp_data_ddt_7
+  					data_ddt_matched = True 				
+				End If			
+
+			End If 
+
+			If (Not (data_ddt_matched) ) Then
+				Set objRE3C = New RegExp
+				
+				With objRE3C
+					.Pattern    = "^(\d{6})$"
+					.IgnoreCase = True
+					.Global     = False
+				End With
+
+				If objRE3C.Test( sped.data_ddt ) Then
+					tmp_data_ddt_6 = ""
+					For i = 1 To Len(sped.data_ddt)
+    					tmp_char_6 = Mid(sped.data_ddt, i, 1)
+    					If (i = 2) Then
+    						tmp_data_ddt_6 = tmp_data_ddt_6 + "/"
+    					End If
+    					If (i = 3) Then
+    						tmp_data_ddt_6 = tmp_data_ddt_6 + "/"
+    					End If
+    					tmp_data_ddt_6 = tmp_data_ddt_6 + tmp_char_6
+  					Next
+  					sped.data_ddt = tmp_data_ddt_6
+  					data_ddt_matched = True 				
+				End If			
+
+			End If 
+					
+			Set objRE = New RegExp
+			
 			With objRE
 				.Pattern    = "^(\d{1,2})/(\d{1,2})/(\d{4})$"
 				.IgnoreCase = True
 				.Global     = False
 			End With
+		
+			sped.data_ddt = Replace(sped.data_ddt,"-","/")
 			
 			If Not objRE.Test( sped.data_ddt ) Then
 				Dim errclDDDTMF: Set errclDDDTMF = New errorclass
@@ -339,7 +423,7 @@
 				errclDDDTMF.desc  = "DATA DDT NON CORRETTA"
 				SpedErrorsAdd(errclDDDTMF)
 				anyErrors = True  
-			End If
+			End If			
 		End If 
 			
 		'Set titolo_oro_id = document.getElementById( "titolo_oro_id" )
@@ -1251,7 +1335,7 @@
 		sped.kt = ""
 		sped.banco_metalli_id = ""
 		'sped.titolo_oro_id = ""
-		sped.data_ddt = ""
+		sped.data_ddt = FormatDateTime(Now,2)
 		sped.numero_ddt  = ""
 		'sped.grammi_lordi = 0
 		'sped.grammi_puri_stimati = 0
